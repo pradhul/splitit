@@ -2,15 +2,18 @@ import { Colors } from '@/constants/Colors';
 import { Text, View, TextInput, Pressable, StyleSheet } from 'react-native';
 import { BorderRadius, FontSize, Margins, Paddings } from '@/constants/Dimensions';
 import { RecordPaymentPage } from '@/constants/Strings';
+import { useState } from 'react';
 
 const colors = Colors.light;
 
 export default function Index() {
+
+  const [amount, setAmount] = useState("0");
   return (
     <View style={styles.container}>
       <View>
-      <TextInput style={styles.inputPayment} value='0'/>
-      <Pressable style={styles.buttonPayment}><Text style={styles.TextPayment}>{RecordPaymentPage.recordPayment}</Text></Pressable>
+      <TextInput autoFocus={true} keyboardType='number-pad' style={styles.inputPayment} onChangeText={text => {setAmount(text)}} />
+      <Pressable style={styles.buttonPayment} onPress={() => {}}><Text style={styles.TextPayment}>{RecordPaymentPage.recordPayment}</Text></Pressable>
       </View>
     </View>
   );
@@ -28,7 +31,9 @@ const styles = StyleSheet.create({
     padding: Paddings.normal,
     textAlign: 'center',
     fontSize: 50,
-    marginBottom: Margins.large
+    marginBottom: Margins.large,
+    borderBottomWidth: .5,
+    borderBottomColor: colors.primary1
   },
   buttonPayment: {
     backgroundColor: colors.primary1,
