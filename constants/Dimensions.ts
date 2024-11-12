@@ -1,17 +1,17 @@
 export const Margins = {
-    normal: 5,
-    large: 10,
-}
+  normal: 5,
+  large: 10,
+};
 
 export const Paddings = {
-    normal: 5,
-    large: 10,
-}
+  normal: 5,
+  large: 10,
+};
 
 export const FontSize = {
-    normal: 14
-}
+  normal: 14,
+};
 
 export const BorderRadius = {
-    button: 10
-}
+  button: 10,
+};

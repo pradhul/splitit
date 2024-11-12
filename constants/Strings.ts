@@ -1,7 +1,7 @@
 export const Titles = {
-    recordPaymentPage: 'Record Payment'
-}
+  recordPaymentPage: "Record Payment",
+};
 
 export const RecordPaymentPage = {
-    recordPayment: 'Record Payment'
-}
+  recordPayment: "Record Payment",
+};
