@@ -3,5 +3,5 @@ export const Titles = {
 };
 
 export const RecordPaymentPage = {
-  recordPayment: "Record Payment",
+  recordPaymentButton: "Record Payment",
 };

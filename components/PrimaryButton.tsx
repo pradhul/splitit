@@ -7,8 +7,8 @@ const colors = Colors.light;
 
 export default function PrimaryButton() {
   return (
-    <Pressable style={styles.buttonPayment} onPress={() => {}}>
-      <Text style={styles.TextPayment}>{RecordPaymentPage.recordPayment}</Text>
+    <Pressable testID='primary-button' style={styles.buttonPayment} onPress={() => {}}>
+      <Text style={styles.TextPayment}>{RecordPaymentPage.recordPaymentButton}</Text>
     </Pressable>
   );
 }
