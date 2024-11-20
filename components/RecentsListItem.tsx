@@ -1,19 +1,34 @@
 import { Margins, Paddings } from "@/constants/Dimensions";
 import { StyleSheet, View, Text } from "react-native";
+import { ITransaction } from "../app/features/transactionSlice";
 
-export default function RecentsListItem() {
+interface IRecentItem extends Omit<ITransaction, "modified"> {
+  key: string;
+}
+
+const RecentsListItem: React.FC<IRecentItem> = ({
+  key,
+  amount,
+  category,
+  from,
+  to,
+  status,
+  created,
+}) => {
   return (
-    <View style={styles.recentsItemContainer}>
+    <View key={key} style={styles.recentsItemContainer}>
       <View style={styles.recentsIcon}></View>
 
       <View style={styles.recentsDetailContainer}>
-        <Text>Graphic</Text>
-        <Text>Someone paid 100 to someone</Text>
-        <Text>on 29th Friday evening 4:30</Text>
+        <Text>Graphic {status}</Text>
+        <Text>
+          {from} paid {amount} to {to}
+        </Text>
+        <Text>on 29th Friday evening 4:30 {created}</Text>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   recentsItemContainer: {
@@ -34,3 +49,5 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 });
+
+export default RecentsListItem;

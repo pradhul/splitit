@@ -13,18 +13,40 @@ import { FontSize, Margins, Paddings } from "@/constants/Dimensions";
 import RecentsListItem from "@/components/RecentsListItem";
 import { useQuery } from "@tanstack/react-query";
 import { getRecentTransactions } from "@/apis";
-
-const colors = Colors.light;
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { useEffect } from "react";
+import { ITransaction, setTransactions } from "./features/transactionSlice";
 
 export default function Index() {
-  const { isQuery, isPending, isSuccess, data, error } = useQuery({
+  const recents = useAppSelector((store) => store.transactions);
+  const dispatch = useAppDispatch();
+
+  const { isPending, isSuccess, data, error } = useQuery({
     queryKey: ["recents"],
     queryFn: getRecentTransactions,
   });
 
+  useEffect(() => {
+    if (isSuccess && data) {
+      const transformedData = data.map(
+        (item: {
+          document: { fields: { amount: { integerValue: any } } };
+        }): ITransaction => ({
+          created: item.document.fields.amount.integerValue,
+          modified: "",
+          amount: 0,
+          category: "",
+          from: "",
+          to: "",
+          status: "",
+        })
+      );
+      dispatch(setTransactions(transformedData));
+    }
+  }, [isSuccess, data, dispatch]);
+
   return (
     <View style={styles.container}>
-      {console.log(data[0].document)}
       <View style={styles.paymentContainer}>
         <PrimaryInput />
         <PrimaryButton />
@@ -38,13 +60,26 @@ export default function Index() {
     return (
       <View style={styles.recentPaymentsContainer}>
         <Text style={styles.recentsTitle}>Recents</Text>
-        <RecentsListItem />
-        <RecentsListItem />
-        <RecentsListItem />
+        {recents.map((transaction, index) => {
+          console.dir(transaction);
+          return (
+            <RecentsListItem
+              key={transaction.created}
+              amount={transaction.amount}
+              from={transaction.from}
+              to={transaction.to}
+              status={transaction.status}
+              category={transaction.category}
+              created={transaction.category}
+            />
+          );
+        })}
       </View>
     );
   }
 }
+
+const colors = Colors.light;
 
 const styles = StyleSheet.create({
   container: {
