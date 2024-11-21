@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface ITransaction {
-  created: string;
-  modified: string;
+  _created: string;
+  _modified: string;
   amount: number;
   category: string;
   from: string;
@@ -12,8 +12,8 @@ export interface ITransaction {
 
 const initialState: ITransaction[] = [
   {
-    created: "",
-    modified: "",
+    _created: "",
+    _modified: "",
     amount: 20,
     category: "Fuel",
     from: "Me",
@@ -27,7 +27,6 @@ const transactionsSlice = createSlice({
   initialState,
   reducers: {
     setTransactions: (state, action: PayloadAction<ITransaction[]>) => {
-      console.dir("=======================================", action.payload);
       return action.payload;
     },
   },

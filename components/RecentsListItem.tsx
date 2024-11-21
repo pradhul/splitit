@@ -2,7 +2,7 @@ import { Margins, Paddings } from "@/constants/Dimensions";
 import { StyleSheet, View, Text } from "react-native";
 import { ITransaction } from "../app/features/transactionSlice";
 
-interface IRecentItem extends Omit<ITransaction, "modified"> {
+interface IRecentItem extends Omit<ITransaction, "_modified"> {
   key: string;
 }
 
@@ -13,7 +13,7 @@ const RecentsListItem: React.FC<IRecentItem> = ({
   from,
   to,
   status,
-  created,
+  _created,
 }) => {
   return (
     <View key={key} style={styles.recentsItemContainer}>
@@ -24,7 +24,7 @@ const RecentsListItem: React.FC<IRecentItem> = ({
         <Text>
           {from} paid {amount} to {to}
         </Text>
-        <Text>on 29th Friday evening 4:30 {created}</Text>
+        <Text>on 29th Friday evening 4:30 {_created}</Text>
       </View>
     </View>
   );

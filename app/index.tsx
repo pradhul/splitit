@@ -28,21 +28,10 @@ export default function Index() {
 
   useEffect(() => {
     if (isSuccess && data) {
-      const transformedData = data.map(
-        (item: {
-          document: { fields: { amount: { integerValue: any } } };
-        }): ITransaction => ({
-          created: item.document.fields.amount.integerValue,
-          modified: "",
-          amount: 0,
-          category: "",
-          from: "",
-          to: "",
-          status: "",
-        })
-      );
-      dispatch(setTransactions(transformedData));
+      console.log("Dispatching...");
+      dispatch(setTransactions(data));
     }
+    console.log("............", data);
   }, [isSuccess, data, dispatch]);
 
   return (
@@ -61,16 +50,16 @@ export default function Index() {
       <View style={styles.recentPaymentsContainer}>
         <Text style={styles.recentsTitle}>Recents</Text>
         {recents.map((transaction, index) => {
-          console.dir(transaction);
+          console.log("=======================", transaction);
           return (
             <RecentsListItem
-              key={transaction.created}
+              key={transaction._created}
               amount={transaction.amount}
               from={transaction.from}
               to={transaction.to}
               status={transaction.status}
               category={transaction.category}
-              created={transaction.category}
+              _created={transaction._created}
             />
           );
         })}
