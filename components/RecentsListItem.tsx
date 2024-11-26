@@ -1,13 +1,13 @@
 import { Margins, Paddings } from "@/constants/Dimensions";
 import { StyleSheet, View, Text } from "react-native";
 import { ITransaction } from "../app/features/transactionSlice";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { TransactionStatus } from "@/constants/Strings";
+import { Colors } from "@/constants/Colors";
 
-interface IRecentItem extends Omit<ITransaction, "_modified"> {
-  key: string;
-}
+interface IRecentItem extends Omit<ITransaction, "_modified"> {}
 
 const RecentsListItem: React.FC<IRecentItem> = ({
-  key,
   amount,
   category,
   from,
@@ -15,12 +15,25 @@ const RecentsListItem: React.FC<IRecentItem> = ({
   status,
   _created,
 }) => {
+  //FIXME: SEttled /Unsettled will not be applicable on single transactions
+  function renderTransactionStatusIcon() {
+    if (status === TransactionStatus.SETTLED)
+      return (
+        <Ionicons
+          name="checkmark-done-circle"
+          size={24}
+          color={Colors.light.primary1}
+        />
+      );
+    else return <Text>Graphic {status}</Text>;
+  }
+
   return (
-    <View key={key} style={styles.recentsItemContainer}>
+    <View key={_created} style={styles.recentsItemContainer}>
       <View style={styles.recentsIcon}></View>
 
       <View style={styles.recentsDetailContainer}>
-        <Text>Graphic {status}</Text>
+        {/* {renderTransactionStatusIcon()} */}
         <Text>
           {from} paid {amount} to {to}
         </Text>
@@ -51,3 +64,7 @@ const styles = StyleSheet.create({
 });
 
 export default RecentsListItem;
+
+function renderTransactionStatusIcon() {
+  throw new Error("Function not implemented.");
+}

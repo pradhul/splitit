@@ -5,3 +5,8 @@ export const Titles = {
 export const RecordPaymentPage = {
   recordPaymentButton: "Record Payment",
 };
+
+export const TransactionStatus = {
+  SETTLED: "settled",
+  UNSETTLED: "unsettled",
+};

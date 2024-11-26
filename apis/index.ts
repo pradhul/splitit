@@ -9,13 +9,15 @@
 import {
   collectionNames,
   DOCUMENT_LIMIT,
-  RUN_QUERY_URL,
+  GET_ALL_DOCUMENTS,
+  GET_DOCUMENTS_BATCH,
+  GET_DOCUMENTS_BATCH_BASE_PATH,
 } from "@/apis/constants";
 import axios from "axios";
 
 export const getRecentTransactions = () =>
   axios
-    .post(RUN_QUERY_URL, {
+    .post(GET_ALL_DOCUMENTS, {
       structuredQuery: {
         from: [
           {
@@ -33,15 +35,33 @@ export const getRecentTransactions = () =>
         limit: DOCUMENT_LIMIT,
       },
     })
-    .then((response) => {
-      return response.data.map((record: any) =>
-        transformFireStoreRecord(record.document.fields)
+    .then(async (response) => {
+      return await Promise.all(
+        response.data.map((record: any) =>
+          transformFireStoreRecord(record.document.fields)
+        )
       );
+    });
+
+/**
+ * Gets Documents in batches
+ * FIXME: This now returns specifically the name field under a firestore reference,
+ * and only returns the first one
+ */
+const getDocumentsBatch = (documents: string[]) =>
+  axios
+    .post(GET_DOCUMENTS_BATCH, {
+      documents,
+    })
+    .then((response) => {
+      // console.log("Response BatchGet", response);
+      return response.data[0].found.fields.name.stringValue;
     });
 
 type FireStoreStringField = "stringValue" | "referenceValue" | "timestampValue";
 type FireStoreNumberField = "integerValue";
 type FireStoreField = FireStoreStringField | FireStoreNumberField;
+type FireStoreRecord = { [key: string]: { [name: string]: string } };
 
 function isFireStoreField(fieldName: string): fieldName is FireStoreField {
   return (
@@ -52,25 +72,38 @@ function isFireStoreField(fieldName: string): fieldName is FireStoreField {
   );
 }
 
-function transformFireStoreRecord(record: any) {
+/**
+ * Changes a firestore document to usable app objects
+ * by changing them to {key:value} and getting readable names from reference objects
+ **/
+async function transformFireStoreRecord(record: FireStoreRecord) {
+  console.log("JSON", record);
   const keys = Object.keys(record);
-  let t;
-  t = keys.map((key) => {
-    const fireStoreFieldName = Object.keys(record[key])[0];
-    const fireStoreFieldValue = record[key];
-    if (isFireStoreField(fireStoreFieldName)) {
-      if (fireStoreFieldName === "integerValue") {
-        return {
-          [key.trim()]: parseInt(fireStoreFieldValue[fireStoreFieldName]),
-        };
+  const result = await keys.reduce(
+    async (accPromise: Promise<Record<string, any>>, key) => {
+      const acc = await Promise.resolve(accPromise);
+      const fireStoreFieldName = Object.keys(record[key])[0] as FireStoreField;
+      const fireStoreFieldObject = record[key];
+      if (isFireStoreField(fireStoreFieldName)) {
+        if (fireStoreFieldName === "integerValue") {
+          acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
+        } else if (fireStoreFieldName === "referenceValue") {
+          console.log("----------------Getting readable name for", key);
+          const readableName = await getDocumentsBatch([
+            fireStoreFieldObject[fireStoreFieldName],
+          ]);
+          console.log("ReadableName", readableName);
+          acc[key.trim()] = readableName;
+        } else {
+          acc[key.trim()] = fireStoreFieldObject[fireStoreFieldName];
+        }
       } else {
-        return { [key.trim()]: fireStoreFieldValue[fireStoreFieldName] };
+        throw Error("Not Firestore Data");
       }
-    } else {
-      throw Error("Not Firestore Data");
-    }
-  });
-  console.log("+++++++++++++++++++", Object.assign({}, ...t));
-  return Object.assign({}, ...t);
+      return acc;
+    },
+    Promise.resolve({})
+  );
+  // console.log("------------------transform", result);
+  return result;
 }
-

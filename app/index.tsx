@@ -15,7 +15,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getRecentTransactions } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { useEffect } from "react";
-import { ITransaction, setTransactions } from "./features/transactionSlice";
+import { setTransactions } from "./features/transactionSlice";
+import { FlashList } from "@shopify/flash-list";
 
 export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
@@ -28,10 +29,9 @@ export default function Index() {
 
   useEffect(() => {
     if (isSuccess && data) {
-      console.log("Dispatching...");
+      // console.log("Dispatching..", data);
       dispatch(setTransactions(data));
     }
-    console.log("............", data);
   }, [isSuccess, data, dispatch]);
 
   return (
@@ -49,20 +49,21 @@ export default function Index() {
     return (
       <View style={styles.recentPaymentsContainer}>
         <Text style={styles.recentsTitle}>Recents</Text>
-        {recents.map((transaction, index) => {
-          console.log("=======================", transaction);
-          return (
+        <FlashList
+          data={recents}
+          renderItem={({ item }) => (
             <RecentsListItem
-              key={transaction._created}
-              amount={transaction.amount}
-              from={transaction.from}
-              to={transaction.to}
-              status={transaction.status}
-              category={transaction.category}
-              _created={transaction._created}
+              key={item._created}
+              amount={item.amount}
+              from={item.from}
+              to={item.to}
+              status={item.status}
+              category={item.category}
+              _created={item._created}
             />
-          );
-        })}
+          )}
+          estimatedItemSize={50}
+        />
       </View>
     );
   }
