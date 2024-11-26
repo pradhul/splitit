@@ -29,7 +29,7 @@ const RecentsListItem: React.FC<IRecentItem> = ({
   }
 
   return (
-    <View key={_created} style={styles.recentsItemContainer}>
+    <View style={styles.recentsItemContainer}>
       <View style={styles.recentsIcon}></View>
 
       <View style={styles.recentsDetailContainer}>

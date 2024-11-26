@@ -6,7 +6,7 @@
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
 import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
 import { FontSize, Margins, Paddings } from "@/constants/Dimensions";
@@ -40,20 +40,24 @@ export default function Index() {
         <PrimaryInput />
         <PrimaryButton />
       </View>
-
-      {isSuccess && recentTransactionsContainer()}
+      {recentTransactionsContainer()}
     </View>
   );
 
   function recentTransactionsContainer() {
     return (
       <View style={styles.recentPaymentsContainer}>
-        <Text style={styles.recentsTitle}>Recents</Text>
+        <View style={styles.recentTitleContainer}>
+          <Text style={styles.recentsTitle}>Recents</Text>
+          {isPending && (
+            <ActivityIndicator size={"small"} color={colors.primary1} />
+          )}
+        </View>
         <FlashList
           data={recents}
+          keyExtractor={(item) => item._created}
           renderItem={({ item }) => (
             <RecentsListItem
-              key={item._created}
               amount={item.amount}
               from={item.from}
               to={item.to}
@@ -86,6 +90,9 @@ const styles = StyleSheet.create({
     width: "100%",
     borderWidth: 1,
     marginTop: Margins.large,
+  },
+  recentTitleContainer: {
+    flexDirection: "row",
   },
   recentsTitle: {
     color: colors.neutral1,
