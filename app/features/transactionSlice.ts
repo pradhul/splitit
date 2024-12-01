@@ -7,20 +7,9 @@ export interface ITransaction {
   category: string;
   from: string;
   to: string;
-  status: string;
 }
 
-const initialState: ITransaction[] = [
-  {
-    _created: "",
-    _modified: "",
-    amount: 20,
-    category: "Fuel",
-    from: "Me",
-    to: "You",
-    status: "settled",
-  },
-];
+const initialState: ITransaction[] | [] = [];
 
 const transactionsSlice = createSlice({
   name: "Transactions",

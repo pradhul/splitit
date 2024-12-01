@@ -19,22 +19,8 @@ const RecentsListItem = ({
   category,
   from,
   to,
-  status,
   _created,
 }: IRecentItem) => {
-  //FIXME: SEttled /Unsettled will not be applicable on single transactions
-  function renderTransactionStatusIcon() {
-    if (status === TransactionStatus.SETTLED)
-      return (
-        <Ionicons
-          name="checkmark-done-circle"
-          size={24}
-          color={Colors.light.primary1}
-        />
-      );
-    else return <Text>Graphic {status}</Text>;
-  }
-
   function getReadableDateTime(dateTime: string): string {
     const today = new Date();
     const pastDate = new Date(dateTime);
@@ -60,7 +46,6 @@ const RecentsListItem = ({
       <View style={styles.recentsIcon}></View>
 
       <View style={styles.recentsDetailContainer}>
-        {/* {renderTransactionStatusIcon()} */}
         <Text style={styles.transactionText}>
           <Text style={styles.from}>{from}</Text> Paid{" "}
           <Text style={styles.amount}>{amount}₹</Text> To
