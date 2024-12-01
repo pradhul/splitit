@@ -1,5 +1,12 @@
-import { Colors } from '@/constants/Colors';
-import { Paddings, Margins } from '@/constants/Dimensions';
+/**
+ * @author Pradhul
+ * @email pradhudev.1990@gmail.com
+ * @create date 2024-12-02 04:15:44
+ * @modify date 2024-12-02 04:15:44
+ * @desc [description]
+ */
+import { Colors } from "@/constants/Colors";
+import { Paddings, Margins } from "@/constants/Dimensions";
 import React from "react";
 import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";

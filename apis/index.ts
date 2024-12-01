@@ -11,7 +11,6 @@ import {
   DOCUMENT_LIMIT,
   GET_ALL_DOCUMENTS,
   GET_DOCUMENTS_BATCH,
-  GET_DOCUMENTS_BATCH_BASE_PATH,
 } from "@/apis/constants";
 import axios from "axios";
 
@@ -104,6 +103,5 @@ async function transformFireStoreRecord(record: FireStoreRecord) {
     },
     Promise.resolve({})
   );
-  // console.log("------------------transform", result);
   return result;
 }

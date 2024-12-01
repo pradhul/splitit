@@ -1,3 +1,10 @@
+/**
+ * @author Pradhul
+ * @email pradhudev.1990@gmail.com
+ * @create date 2024-12-02 04:14:24
+ * @modify date 2024-12-02 04:14:24
+ * @desc [description]
+ */
 import {
   useAnimatedStyle,
   useSharedValue,

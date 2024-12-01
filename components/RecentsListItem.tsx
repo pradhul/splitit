@@ -1,3 +1,10 @@
+/**
+ * @author Pradhul
+ * @email pradhudev.1990@gmail.com
+ * @create date 2024-12-02 04:15:49
+ * @modify date 2024-12-02 04:15:49
+ * @desc [description]
+ */
 import { Margins, Paddings } from "@/constants/Dimensions";
 import { StyleSheet, View, Text } from "react-native";
 import { ITransaction } from "../app/features/transactionSlice";
