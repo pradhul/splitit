@@ -6,7 +6,7 @@
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
-import { BorderRadius, Paddings } from "@/constants/Dimensions";
+import { BorderRadius, Margins, Paddings } from "@/constants/Dimensions";
 import { useBounce } from "@/hooks/useBounce";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
@@ -37,6 +37,10 @@ export default function Tag({
     ...styles.tagText,
     fontWeight: isSelected ? "bold" : "normal",
   } as TextStyle;
+  const tagBGColor = {
+    ...styles.categoryTag,
+    backgroundColor: isSelected ? colors.accent1Selected : colors.accent1,
+  };
 
   function tagSelected(): void {
     bounce();
@@ -45,7 +49,7 @@ export default function Tag({
 
   return (
     <AnimatedTouchable
-      style={[styles.categoryTag, bounceStyle]}
+      style={[tagBGColor, bounceStyle]}
       activeOpacity={1}
       onPress={() => tagSelected()}
     >
@@ -60,10 +64,10 @@ const styles = StyleSheet.create({
   categoryTag: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.accent1,
     paddingHorizontal: Paddings.large,
     paddingVertical: Paddings.normal,
     borderRadius: 40,
+    margin: Margins.small,
   },
   tagText: {
     color: colors.neutral1,

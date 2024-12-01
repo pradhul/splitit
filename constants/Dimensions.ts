@@ -1,4 +1,5 @@
 export const Margins = {
+  small: 2,
   normal: 5,
   large: 10,
 };
