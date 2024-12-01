@@ -6,7 +6,14 @@
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
-import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  Platform,
+  TouchableOpacity,
+} from "react-native";
 import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
 import { FontSize, Margins, Paddings } from "@/constants/Dimensions";
@@ -14,9 +21,12 @@ import RecentsListItem from "@/components/RecentsListItem";
 import { useQuery } from "@tanstack/react-query";
 import { getRecentTransactions } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { setTransactions } from "./features/transactionSlice";
 import { FlashList } from "@shopify/flash-list";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import Tag from "@/components/Tag";
+import TagGroup from "@/components/TagGroup";
 
 export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
@@ -38,6 +48,26 @@ export default function Index() {
     <View style={styles.container}>
       <View style={styles.paymentContainer}>
         <PrimaryInput />
+        <View style={styles.paymentDetails}>
+          <View style={styles.paymentCategoryContainer}>
+            <Text>Category</Text>
+            <View style={styles.paymentCategories}>
+              <TagGroup multiselect>
+                <Tag
+                  onTagSelected={(selected: string) =>
+                    console.log("Selected Tag", selected)
+                  }
+                  text="Fuel"
+                />
+                <Tag text="Food" />
+                <Tag text="Alcohol" />
+              </TagGroup>
+            </View>
+          </View>
+          <View style={styles.paymentPartiesContainer}>
+            <Text>To</Text>
+          </View>
+        </View>
         <PrimaryButton />
       </View>
       {recentTransactionsContainer()}
@@ -55,7 +85,7 @@ export default function Index() {
         </View>
         <FlashList
           data={recents}
-          keyExtractor={(item) => item._created}
+          keyExtractor={(item) => item._created + Platform.OS}
           renderItem={({ item }) => (
             <RecentsListItem
               amount={item.amount}
@@ -77,19 +107,40 @@ const colors = Colors.light;
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     alignItems: "center",
     backgroundColor: colors.backGround,
     padding: Paddings.normal,
   },
   paymentContainer: {
-    borderWidth: 1,
+    // borderWidth: 1,
     width: "100%",
+  },
+  paymentDetails: {
+    borderWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: Paddings.normal,
+  },
+  paymentCategoryContainer: {
+    borderWidth: 1,
+    flex: 1,
+  },
+  paymentCategories: {
+    flexDirection: "row",
+    padding: Paddings.normal,
+  },
+  paymentPartiesContainer: {
+    borderWidth: 1,
+    flex: 1,
+    flexDirection: "row",
   },
   recentPaymentsContainer: {
     width: "100%",
-    borderWidth: 1,
+    // borderWidth: 1,
     marginTop: Margins.large,
+    // minHeight: 100,
+    flex: 1,
   },
   recentTitleContainer: {
     flexDirection: "row",

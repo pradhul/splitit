@@ -77,7 +77,7 @@ function isFireStoreField(fieldName: string): fieldName is FireStoreField {
  * by changing them to {key:value} and getting readable names from reference objects
  **/
 async function transformFireStoreRecord(record: FireStoreRecord) {
-  console.log("JSON", record);
+  //   console.log("JSON", record);
   const keys = Object.keys(record);
   const result = await keys.reduce(
     async (accPromise: Promise<Record<string, any>>, key) => {
@@ -88,11 +88,11 @@ async function transformFireStoreRecord(record: FireStoreRecord) {
         if (fireStoreFieldName === "integerValue") {
           acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
         } else if (fireStoreFieldName === "referenceValue") {
-          console.log("----------------Getting readable name for", key);
+          //   console.log("----------------Getting readable name for", key);
           const readableName = await getDocumentsBatch([
             fireStoreFieldObject[fireStoreFieldName],
           ]);
-          console.log("ReadableName", readableName);
+          //   console.log("ReadableName", readableName);
           acc[key.trim()] = readableName;
         } else {
           acc[key.trim()] = fireStoreFieldObject[fireStoreFieldName];
