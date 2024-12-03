@@ -23,7 +23,10 @@ import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import React, { useEffect } from "react";
 import { setTransactions } from "./features/transactionSlice";
 import { FlashList } from "@shopify/flash-list";
-import PaymentOptions from "./RecordPayment/PaymentOptions";
+import PaymentOptions from "@/app/RecordPayment/PaymentOptions";
+import RecentTransactions from "@/app/RecordPayment/RecentTransactions/RecentTransactions";
+import { isPending } from "@reduxjs/toolkit";
+import { RecordPaymentPage } from "@/constants/Strings";
 
 export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
@@ -45,39 +48,15 @@ export default function Index() {
     <View style={styles.container}>
       <View style={styles.paymentContainer}>
         <PaymentOptions />
-        <PrimaryInput />
-        <PrimaryButton />
+        <PrimaryInput
+          placeholder={RecordPaymentPage.rupeeSymbol}
+          keyboardType="number-pad"
+        />
+        <PrimaryButton title={RecordPaymentPage.recordPaymentButton} />
       </View>
-      {recentTransactionsContainer()}
+      <RecentTransactions {...{ isPending, recents }} />
     </View>
   );
-
-  function recentTransactionsContainer() {
-    return (
-      <View style={styles.recentPaymentsContainer}>
-        <View style={styles.recentTitleContainer}>
-          <Text style={styles.recentsTitle}>Recents</Text>
-          {isPending && (
-            <ActivityIndicator size={"small"} color={colors.primary1} />
-          )}
-        </View>
-        <FlashList
-          data={recents}
-          keyExtractor={(item) => item._created + Platform.OS}
-          renderItem={({ item }) => (
-            <RecentsListItem
-              amount={item.amount}
-              from={item.from}
-              to={item.to}
-              category={item.category}
-              _created={item._created}
-            />
-          )}
-          estimatedItemSize={50}
-        />
-      </View>
-    );
-  }
 }
 
 const colors = Colors.light;
@@ -111,21 +90,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flex: 1,
     flexDirection: "row",
-  },
-  recentPaymentsContainer: {
-    width: "100%",
-    // borderWidth: 1,
-    marginTop: Margins.large,
-    // minHeight: 100,
-    flex: 1,
-  },
-  recentTitleContainer: {
-    flexDirection: "row",
-  },
-  recentsTitle: {
-    color: colors.neutral1,
-    fontSize: FontSize.normal,
-    fontWeight: "bold",
-    padding: Paddings.large,
   },
 });

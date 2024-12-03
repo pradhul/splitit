@@ -9,18 +9,27 @@ import { Colors } from "@/constants/Colors";
 import { Paddings, Margins } from "@/constants/Dimensions";
 import React from "react";
 import { useState } from "react";
-import { StyleSheet, TextInput } from "react-native";
+import { KeyboardTypeOptions, StyleSheet, TextInput } from "react-native";
 
 const colors = Colors.light;
+interface IPrimaryInput {
+  autofocus?: boolean;
+  keyboardType?: KeyboardTypeOptions;
+  placeholder: string;
+}
 
-function PrimaryInput() {
+function PrimaryInput({
+  autofocus = true,
+  keyboardType = "default",
+  placeholder = "",
+}: IPrimaryInput) {
   const [amount, setAmount] = useState("");
 
   return (
     <TextInput
-      autoFocus={true}
-      keyboardType="number-pad"
-      placeholder="₹"
+      autoFocus={autofocus}
+      keyboardType={keyboardType}
+      placeholder={placeholder}
       value={amount}
       style={styles.inputPayment}
       onChangeText={(text) => {

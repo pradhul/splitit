@@ -7,21 +7,18 @@
  */
 import { Colors } from "@/constants/Colors";
 import { Paddings, BorderRadius, FontSize } from "@/constants/Dimensions";
-import { RecordPaymentPage } from "@/constants/Strings";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 const colors = Colors.light;
 
-export default function PrimaryButton() {
+export default function PrimaryButton({ title }: { title: string }) {
   return (
     <Pressable
       testID="primary-button"
       style={styles.buttonPayment}
       onPress={() => {}}
     >
-      <Text style={styles.TextPayment}>
-        {RecordPaymentPage.recordPaymentButton}
-      </Text>
+      <Text style={styles.TextPayment}>{title}</Text>
     </Pressable>
   );
 }

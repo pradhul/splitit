@@ -26,7 +26,7 @@ export default function PaymentOptions() {
         <Text>To</Text>
         <View style={styles.paymentParties}>
           <TagGroup multiselect>
-            <Tag type="user" text="Sijo" />
+            <Tag type="user" text="Person 1" />
           </TagGroup>
         </View>
       </View>

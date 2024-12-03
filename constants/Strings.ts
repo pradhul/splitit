@@ -11,6 +11,7 @@ export const Titles = {
 
 export const RecordPaymentPage = {
   recordPaymentButton: "Record Payment",
+  rupeeSymbol: "₹",
 };
 
 export const TransactionStatus = {

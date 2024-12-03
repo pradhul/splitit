@@ -6,9 +6,8 @@
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
-import { BorderRadius, Margins, Paddings } from "@/constants/Dimensions";
+import { Margins, Paddings } from "@/constants/Dimensions";
 import { useBounce } from "@/hooks/useBounce";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -31,6 +30,7 @@ export default function Tag({
   type = "category",
 }: ITagProps) {
   const { bounce, bounceStyle } = useBounce();
+  const ellipsisLimit = 7;
 
   const isCategoryType = type === "category";
   const iconName = isCategoryType ? "fast-food" : "person";
@@ -43,12 +43,19 @@ export default function Tag({
     backgroundColor: isSelected ? colors.accent1Selected : colors.accent1,
     borderRadius: isCategoryType ? 40 : 100,
     paddingVertical: isCategoryType ? Paddings.normal : Paddings.large,
+    flexShrink: 1,
   };
 
-  function tagSelected(): void {
+  const truncateText = () => {
+    const name =
+      text && text.length > 7 ? `${text.slice(0, ellipsisLimit)}...` : text;
+    return <Text style={tagTextStyle}>{name}</Text>;
+  };
+
+  const tagSelected = () => {
     bounce();
     onTagPress && onTagPress();
-  }
+  };
 
   return (
     <View style={{ flexDirection: "column", alignItems: "center" }}>
@@ -58,9 +65,9 @@ export default function Tag({
         onPress={() => tagSelected()}
       >
         <Ionicons name={iconName} size={20} color={colors.neutral1} />
-        {isCategoryType && <Text style={tagTextStyle}>{text}</Text>}
+        {isCategoryType && truncateText()}
       </AnimatedTouchable>
-      {!isCategoryType && <Text style={tagTextStyle}>{text}</Text>}
+      {!isCategoryType && truncateText()}
     </View>
   );
 }
