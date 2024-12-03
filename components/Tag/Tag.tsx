@@ -6,16 +6,11 @@
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
-import { BorderRadius, Margins, Paddings } from "@/constants/Dimensions";
+import { Margins, Paddings } from "@/constants/Dimensions";
 import { useBounce } from "@/hooks/useBounce";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useState } from "react";
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
-import Animated, {
-  useSharedValue,
-  withSequence,
-  withSpring,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { TextStyle } from "react-native/Libraries/StyleSheet/StyleSheetTypes";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);

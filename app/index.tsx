@@ -12,7 +12,6 @@ import {
   Text,
   ActivityIndicator,
   Platform,
-  TouchableOpacity,
 } from "react-native";
 import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
@@ -24,9 +23,6 @@ import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import React, { useEffect } from "react";
 import { setTransactions } from "./features/transactionSlice";
 import { FlashList } from "@shopify/flash-list";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import Tag from "@/components/Tag";
-import TagGroup from "@/components/TagGroup";
 import PaymentOptions from "./RecordPayment/PaymentOptions";
 
 export default function Index() {
