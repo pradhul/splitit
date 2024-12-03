@@ -5,6 +5,7 @@ import { View, Text, StyleSheet } from "react-native";
 export default function PaymentOptions() {
   return (
     <View style={styles.paymentDetails}>
+      {/* Category section*/}
       <View style={styles.paymentCategoryContainer}>
         <Text>Category</Text>
         <View style={styles.paymentCategories}>
@@ -20,8 +21,14 @@ export default function PaymentOptions() {
           </TagGroup>
         </View>
       </View>
+      {/* To section*/}
       <View style={styles.paymentPartiesContainer}>
         <Text>To</Text>
+        <View style={styles.paymentParties}>
+          <TagGroup multiselect>
+            <Tag type="user" text="Sijo" />
+          </TagGroup>
+        </View>
       </View>
     </View>
   );
@@ -29,22 +36,25 @@ export default function PaymentOptions() {
 
 const styles = StyleSheet.create({
   paymentDetails: {
-    borderWidth: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    // borderWidth: 1,
     padding: Paddings.normal,
   },
   paymentCategoryContainer: {
-    borderWidth: 1,
-    flex: 1,
+    // borderWidth: 1,
   },
   paymentCategories: {
+    // borderWidth: 1,
     flexDirection: "row",
     padding: Paddings.normal,
+    flexWrap: "wrap",
   },
   paymentPartiesContainer: {
-    borderWidth: 1,
+    // borderWidth: 1,
+    padding: Paddings.normal,
     flex: 1,
+    flexDirection: "column",
+  },
+  paymentParties: {
     flexDirection: "row",
   },
 });

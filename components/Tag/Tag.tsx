@@ -6,10 +6,11 @@
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
-import { Margins, Paddings } from "@/constants/Dimensions";
+import { BorderRadius, Margins, Paddings } from "@/constants/Dimensions";
 import { useBounce } from "@/hooks/useBounce";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { StyleSheet, TouchableOpacity, Text } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { TextStyle } from "react-native/Libraries/StyleSheet/StyleSheetTypes";
 
@@ -20,21 +21,28 @@ export interface ITagProps {
   onTagSelected?: Function;
   onTagPress?: Function;
   isSelected?: boolean;
+  type?: "category" | "user";
 }
 export default function Tag({
   text,
   onTagSelected,
   onTagPress,
   isSelected,
+  type = "category",
 }: ITagProps) {
   const { bounce, bounceStyle } = useBounce();
+
+  const isCategoryType = type === "category";
+  const iconName = isCategoryType ? "fast-food" : "person";
   const tagTextStyle = {
     ...styles.tagText,
     fontWeight: isSelected ? "bold" : "normal",
   } as TextStyle;
-  const tagBGColor = {
+  const tagStyle = {
     ...styles.categoryTag,
     backgroundColor: isSelected ? colors.accent1Selected : colors.accent1,
+    borderRadius: isCategoryType ? 40 : 100,
+    paddingVertical: isCategoryType ? Paddings.normal : Paddings.large,
   };
 
   function tagSelected(): void {
@@ -43,14 +51,17 @@ export default function Tag({
   }
 
   return (
-    <AnimatedTouchable
-      style={[tagBGColor, bounceStyle]}
-      activeOpacity={1}
-      onPress={() => tagSelected()}
-    >
-      <MaterialCommunityIcons name="fuel" size={20} color={colors.neutral1} />
-      <Text style={tagTextStyle}>{text}</Text>
-    </AnimatedTouchable>
+    <View style={{ flexDirection: "column", alignItems: "center" }}>
+      <AnimatedTouchable
+        style={[tagStyle, bounceStyle]}
+        activeOpacity={1}
+        onPress={() => tagSelected()}
+      >
+        <Ionicons name={iconName} size={20} color={colors.neutral1} />
+        {isCategoryType && <Text style={tagTextStyle}>{text}</Text>}
+      </AnimatedTouchable>
+      {!isCategoryType && <Text style={tagTextStyle}>{text}</Text>}
+    </View>
   );
 }
 const colors = Colors.light;
@@ -60,8 +71,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: Paddings.large,
-    paddingVertical: Paddings.normal,
-    borderRadius: 40,
     margin: Margins.small,
   },
   tagText: {

@@ -33,7 +33,7 @@ export default function TagGroup({
   }
 
   return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+    <View style={{ flexDirection: "row" }}>
       {Children.map(children, (child: React.ReactElement<ITagProps>) => {
         if (isValidElement(child) && child.type === Tag) {
           const isSelected = selectedTags.includes(child.props.text);
