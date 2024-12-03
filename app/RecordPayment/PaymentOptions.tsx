@@ -1,5 +1,4 @@
-import Tag from "@/components/Tag";
-import TagGroup from "@/components/TagGroup";
+import { Tag, TagGroup } from "@/components/Tag";
 import { Paddings } from "@/constants/Dimensions";
 import { View, Text, StyleSheet } from "react-native";
 
