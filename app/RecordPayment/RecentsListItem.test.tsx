@@ -6,7 +6,7 @@
  * @desc [description]
  */
 import { render, screen } from "@testing-library/react-native";
-import RecentsListItem from "@/components/RecentsListItem";
+import RecentsListItem from "./RecentsListItem";
 
 /** This will have to be modified once listItems are renderd using an array of values */
 describe("<RecentsListItem />", () => {

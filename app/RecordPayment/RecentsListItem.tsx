@@ -7,7 +7,7 @@
  */
 import { Margins, Paddings } from "@/constants/Dimensions";
 import { StyleSheet, View, Text } from "react-native";
-import { ITransaction } from "../app/features/transactionSlice";
+import { ITransaction } from "@/app/features/transactionSlice";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { TransactionStatus } from "@/constants/Strings";
 import { Colors } from "@/constants/Colors";

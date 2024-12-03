@@ -17,7 +17,7 @@ import {
 import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
 import { FontSize, Margins, Paddings } from "@/constants/Dimensions";
-import RecentsListItem from "@/components/RecentsListItem";
+import RecentsListItem from "@/app/RecordPayment/RecentsListItem";
 import { useQuery } from "@tanstack/react-query";
 import { getRecentTransactions } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
@@ -27,6 +27,7 @@ import { FlashList } from "@shopify/flash-list";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Tag from "@/components/Tag";
 import TagGroup from "@/components/TagGroup";
+import PaymentOptions from "./RecordPayment/PaymentOptions";
 
 export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
@@ -47,27 +48,8 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <View style={styles.paymentContainer}>
+        <PaymentOptions />
         <PrimaryInput />
-        <View style={styles.paymentDetails}>
-          <View style={styles.paymentCategoryContainer}>
-            <Text>Category</Text>
-            <View style={styles.paymentCategories}>
-              <TagGroup multiselect>
-                <Tag
-                  onTagSelected={(selected: string) =>
-                    console.log("Selected Tag", selected)
-                  }
-                  text="Fuel"
-                />
-                <Tag text="Food" />
-                <Tag text="Alcohol" />
-              </TagGroup>
-            </View>
-          </View>
-          <View style={styles.paymentPartiesContainer}>
-            <Text>To</Text>
-          </View>
-        </View>
         <PrimaryButton />
       </View>
       {recentTransactionsContainer()}
@@ -91,7 +73,6 @@ export default function Index() {
               amount={item.amount}
               from={item.from}
               to={item.to}
-              status={item.status}
               category={item.category}
               _created={item._created}
             />
