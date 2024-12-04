@@ -7,34 +7,33 @@
  */
 import { Colors } from "@/constants/Colors";
 import { Paddings, Margins } from "@/constants/Dimensions";
-import React from "react";
-import { useState } from "react";
-import { KeyboardTypeOptions, StyleSheet, TextInput } from "react-native";
+import React, { Dispatch, SetStateAction } from "react";
+import { StyleSheet, TextInput } from "react-native";
 
 const colors = Colors.light;
 interface IPrimaryInput {
   autofocus?: boolean;
-  keyboardType?: KeyboardTypeOptions;
+  keyboardType?: "number-pad" | "default";
   placeholder: string;
+  inputValue: string;
+  onValueChange: Dispatch<SetStateAction<string>>;
 }
 
 function PrimaryInput({
   autofocus = true,
   keyboardType = "default",
   placeholder = "",
-}: IPrimaryInput) {
-  const [amount, setAmount] = useState("");
-
+  inputValue,
+  onValueChange,
+}: React.PropsWithChildren<IPrimaryInput>) {
   return (
     <TextInput
       autoFocus={autofocus}
       keyboardType={keyboardType}
       placeholder={placeholder}
-      value={amount}
+      value={inputValue || ""}
       style={styles.inputPayment}
-      onChangeText={(text) => {
-        setAmount(text);
-      }}
+      onChangeText={(value) => onValueChange(value)}
     />
   );
 }

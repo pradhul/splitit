@@ -20,7 +20,7 @@ import RecentsListItem from "@/app/RecordPayment/RecentsListItem";
 import { useQuery } from "@tanstack/react-query";
 import { getRecentTransactions } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { setTransactions } from "./features/transactionSlice";
 import { FlashList } from "@shopify/flash-list";
 import PaymentOptions from "@/app/RecordPayment/PaymentOptions";
@@ -37,6 +37,10 @@ export default function Index() {
     queryFn: getRecentTransactions,
   });
 
+  const [categories, setCategories] = useState([]);
+  const [paidTo, setPaidTo] = useState([]);
+  const [paidAmount, setPaidAmount] = useState("");
+
   useEffect(() => {
     if (isSuccess && data) {
       // console.log("Dispatching..", data);
@@ -44,15 +48,29 @@ export default function Index() {
     }
   }, [isSuccess, data, dispatch]);
 
+  const recordPayment = () => {
+    console.log("Recording payment...", paidAmount);
+    console.log("Categories:", categories);
+    console.log("Paid to:", paidTo);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.paymentContainer}>
-        <PaymentOptions />
+        <PaymentOptions
+          updateCategories={setCategories}
+          updatePaymentTo={setPaidTo}
+        />
         <PrimaryInput
           placeholder={RecordPaymentPage.rupeeSymbol}
           keyboardType="number-pad"
+          inputValue={paidAmount}
+          onValueChange={setPaidAmount}
         />
-        <PrimaryButton title={RecordPaymentPage.recordPaymentButton} />
+        <PrimaryButton
+          title={RecordPaymentPage.recordPaymentButton}
+          onPress={recordPayment}
+        />
       </View>
       <RecentTransactions {...{ isPending, recents }} />
     </View>

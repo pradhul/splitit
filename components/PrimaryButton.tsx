@@ -11,12 +11,18 @@ import { Pressable, StyleSheet, Text } from "react-native";
 
 const colors = Colors.light;
 
-export default function PrimaryButton({ title }: { title: string }) {
+export default function PrimaryButton({
+  title,
+  onPress,
+}: {
+  title: string;
+  onPress: Function;
+}) {
   return (
     <Pressable
       testID="primary-button"
       style={styles.buttonPayment}
-      onPress={() => {}}
+      onPress={() => onPress()}
     >
       <Text style={styles.TextPayment}>{title}</Text>
     </Pressable>

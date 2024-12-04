@@ -5,20 +5,34 @@
  * @modify date 2024-12-01 03:55:47
  * @desc [description]
  */
-import React, { Children, cloneElement, isValidElement, useState } from "react";
+import React, {
+  Children,
+  cloneElement,
+  isValidElement,
+  useEffect,
+  useState,
+} from "react";
 import { View } from "react-native";
 import Tag, { ITagProps } from "./Tag";
 
 interface ITagGroupProps {
   multiselect?: boolean;
+  onTagChange?: Function;
   children: React.ReactElement<ITagProps> | React.ReactElement<ITagProps>[];
 }
 
 export default function TagGroup({
   multiselect = false,
+  onTagChange,
   children,
 }: ITagGroupProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (onTagChange && Array.isArray(selectedTags)) {
+      onTagChange(selectedTags);
+    }
+  }, [selectedTags, onTagChange]);
 
   function handleTagPress(text: any) {
     if (!multiselect) {

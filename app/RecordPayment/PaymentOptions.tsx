@@ -2,20 +2,22 @@ import { Tag, TagGroup } from "@/components/Tag";
 import { Paddings } from "@/constants/Dimensions";
 import { View, Text, StyleSheet } from "react-native";
 
-export default function PaymentOptions() {
+interface IPaymentOptions {
+  updateCategories: Function;
+  updatePaymentTo: Function;
+}
+export default function PaymentOptions({
+  updateCategories,
+  updatePaymentTo,
+}: IPaymentOptions) {
   return (
     <View style={styles.paymentDetails}>
       {/* Category section*/}
       <View style={styles.paymentCategoryContainer}>
         <Text>Category</Text>
         <View style={styles.paymentCategories}>
-          <TagGroup multiselect>
-            <Tag
-              onTagSelected={(selected: string) =>
-                console.log("Selected Tag", selected)
-              }
-              text="Fuel"
-            />
+          <TagGroup multiselect onTagChange={updateCategories}>
+            <Tag text="Fuel" />
             <Tag text="Food" />
             <Tag text="Alcohol" />
           </TagGroup>
@@ -25,7 +27,7 @@ export default function PaymentOptions() {
       <View style={styles.paymentPartiesContainer}>
         <Text>To</Text>
         <View style={styles.paymentParties}>
-          <TagGroup multiselect>
+          <TagGroup multiselect onTagChange={updatePaymentTo}>
             <Tag type="user" text="Person 1" />
           </TagGroup>
         </View>
