@@ -53,7 +53,6 @@ const getDocumentsBatch = (documents: string[]) =>
       documents,
     })
     .then((response) => {
-      // console.log("Response BatchGet", response);
       return response.data[0].found.fields.name.stringValue;
     });
 
@@ -85,13 +84,14 @@ function isFireStoreField(fieldName: string): fieldName is FireStoreField {
  * by changing them to {key:value} and getting readable names from reference objects
  **/
 async function transformFireStoreRecord(record: FireStoreRecord) {
-  // console.log("JSON", record);
   const keys = Object.keys(record);
   const result = await keys.reduce(
     async (accPromise: Promise<Record<string, any>>, key) => {
       const acc = await Promise.resolve(accPromise);
       const fireStoreFieldName = Object.keys(record[key])[0] as FireStoreField;
-      const fireStoreFieldObject = record[key];
+      const fireStoreFieldObject = record[key] as {
+        [key in FireStoreField]: any;
+      };
       if (isFireStoreField(fireStoreFieldName)) {
         if (fireStoreFieldName === "integerValue") {
           acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
@@ -99,16 +99,11 @@ async function transformFireStoreRecord(record: FireStoreRecord) {
           const readableName = await getDocumentsBatch([
             fireStoreFieldObject[fireStoreFieldName],
           ]);
-          // console.log("ReadableName", readableName);
           acc[key.trim()] = readableName;
         } else if (fireStoreFieldName === "arrayValue") {
-          console.log(
-            "Found ArrayValue",
-            (acc[key.trim()], fireStoreFieldObject[fireStoreFieldName])
-          );
           acc[key.trim()] = await Promise.all(
-            fireStoreFieldObject[fireStoreFieldName].values.map((value) =>
-              transformFireStoreRecord({ [key.trim()]: value })
+            (fireStoreFieldObject[fireStoreFieldName].values as any[]).map(
+              (value) => transformFireStoreRecord({ [key.trim()]: value })
             )
           );
         } else {
@@ -121,10 +116,13 @@ async function transformFireStoreRecord(record: FireStoreRecord) {
     },
     Promise.resolve({})
   );
-  // console.log("Result ", flattenArrays(result));
   return flattenArrays(result);
 }
 
+
+/**
+ * Flattens arrays of objects into a single array of values
+ */
 function flattenArrays(result: Record<string, any>): any {
   const flattened: Record<string, any> = {};
   Object.keys(result).forEach((key) => {
