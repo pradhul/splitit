@@ -42,8 +42,8 @@ export default function Index() {
   const [paidAmount, setPaidAmount] = useState("");
 
   useEffect(() => {
+    console.log("Dispatch check..", isSuccess, data);
     if (isSuccess && data) {
-      // console.log("Dispatching..", data);
       dispatch(setTransactions(data));
     }
   }, [isSuccess, data, dispatch]);

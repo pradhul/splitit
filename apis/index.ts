@@ -36,9 +36,9 @@ export const getRecentTransactions = () =>
     })
     .then(async (response) => {
       return await Promise.all(
-        response.data.map((record: any) =>
-          transformFireStoreRecord(record.document.fields)
-        )
+        response.data.map((record: any) => {
+          return transformFireStoreRecord(record.document.fields);
+        })
       );
     });
 
@@ -57,17 +57,26 @@ const getDocumentsBatch = (documents: string[]) =>
       return response.data[0].found.fields.name.stringValue;
     });
 
-type FireStoreStringField = "stringValue" | "referenceValue" | "timestampValue";
+type FireStoreStringField =
+  | "stringValue"
+  | "referenceValue"
+  | "timestampValue"
+  | "arrayValue";
 type FireStoreNumberField = "integerValue";
 type FireStoreField = FireStoreStringField | FireStoreNumberField;
-type FireStoreRecord = { [key: string]: { [name: string]: string } };
+type FireStoreRecord =
+  | {
+      [key: string]: { [name: string]: string };
+    }
+  | { [key: string]: { values: { [dynamicKey: string]: string }[] } };
 
 function isFireStoreField(fieldName: string): fieldName is FireStoreField {
   return (
     fieldName === "stringValue" ||
     fieldName === "referenceValue" ||
     fieldName === "timestampValue" ||
-    fieldName === "integerValue"
+    fieldName === "integerValue" ||
+    fieldName === "arrayValue"
   );
 }
 
@@ -76,7 +85,7 @@ function isFireStoreField(fieldName: string): fieldName is FireStoreField {
  * by changing them to {key:value} and getting readable names from reference objects
  **/
 async function transformFireStoreRecord(record: FireStoreRecord) {
-  //   console.log("JSON", record);
+  // console.log("JSON", record);
   const keys = Object.keys(record);
   const result = await keys.reduce(
     async (accPromise: Promise<Record<string, any>>, key) => {
@@ -87,12 +96,21 @@ async function transformFireStoreRecord(record: FireStoreRecord) {
         if (fireStoreFieldName === "integerValue") {
           acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
         } else if (fireStoreFieldName === "referenceValue") {
-          //   console.log("----------------Getting readable name for", key);
           const readableName = await getDocumentsBatch([
             fireStoreFieldObject[fireStoreFieldName],
           ]);
-          //   console.log("ReadableName", readableName);
+          // console.log("ReadableName", readableName);
           acc[key.trim()] = readableName;
+        } else if (fireStoreFieldName === "arrayValue") {
+          console.log(
+            "Found ArrayValue",
+            (acc[key.trim()], fireStoreFieldObject[fireStoreFieldName])
+          );
+          acc[key.trim()] = await Promise.all(
+            fireStoreFieldObject[fireStoreFieldName].values.map((value) =>
+              transformFireStoreRecord({ [key.trim()]: value })
+            )
+          );
         } else {
           acc[key.trim()] = fireStoreFieldObject[fireStoreFieldName];
         }
@@ -103,5 +121,19 @@ async function transformFireStoreRecord(record: FireStoreRecord) {
     },
     Promise.resolve({})
   );
-  return result;
+  // console.log("Result ", flattenArrays(result));
+  return flattenArrays(result);
 }
+
+function flattenArrays(result: Record<string, any>): any {
+  const flattened: Record<string, any> = {};
+  Object.keys(result).forEach((key) => {
+    if (Array.isArray(result[key])) {
+      flattened[key] = result[key].map((i) => Object.values(i)[0]);
+    } else {
+      flattened[key] = result[key];
+    }
+  });
+  return flattened;
+}
+
