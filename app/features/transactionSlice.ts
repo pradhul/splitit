@@ -18,9 +18,12 @@ const transactionsSlice = createSlice({
     setTransactions: (state, action: PayloadAction<ITransaction[]>) => {
       return action.payload;
     },
+    addTransaction: (state, action: PayloadAction<ITransaction>) => {
+      return [...state, action.payload];
+    },
   },
 });
 
-export const { setTransactions } = transactionsSlice.actions;
+export const { setTransactions, addTransaction } = transactionsSlice.actions;
 
 export default transactionsSlice.reducer;

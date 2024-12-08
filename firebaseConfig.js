@@ -2,7 +2,7 @@
  * @author Pradhul
  * @email pradhudev.1990@gmail.com
  * @create date 2024-11-15 03:11:17
- * @modify date 2024-12-02 04:16:51
+ * @modify date 2024-12-08 04:34:01
  * @desc [description]
  */
 import { initializeApp } from 'firebase/app';
@@ -24,3 +24,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+export { app, auth, db }; 

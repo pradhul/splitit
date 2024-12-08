@@ -6,26 +6,17 @@
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Platform,
-} from "react-native";
+import { View, StyleSheet } from "react-native";
 import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
-import { FontSize, Margins, Paddings } from "@/constants/Dimensions";
-import RecentsListItem from "@/app/RecordPayment/RecentsListItem";
-import { useQuery } from "@tanstack/react-query";
-import { getRecentTransactions } from "@/apis";
+import { Paddings } from "@/constants/Dimensions";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getRecentTransactions, saveTransaction } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import React, { useEffect, useState } from "react";
-import { setTransactions } from "./features/transactionSlice";
-import { FlashList } from "@shopify/flash-list";
+import { addTransaction, setTransactions } from "./features/transactionSlice";
 import PaymentOptions from "@/app/RecordPayment/PaymentOptions";
 import RecentTransactions from "@/app/RecordPayment/RecentTransactions/RecentTransactions";
-import { isPending } from "@reduxjs/toolkit";
 import { RecordPaymentPage } from "@/constants/Strings";
 
 export default function Index() {
@@ -35,6 +26,11 @@ export default function Index() {
   const { isPending, isSuccess, data, error } = useQuery({
     queryKey: ["recents"],
     queryFn: getRecentTransactions,
+  });
+
+  const mutation = useMutation({
+    mutationFn: saveTransaction,
+    onSuccess: () => console.log("Successfully added transaction"),
   });
 
   const [categories, setCategories] = useState([]);
@@ -52,6 +48,7 @@ export default function Index() {
     console.log("Recording payment...", paidAmount);
     console.log("Categories:", categories);
     console.log("Paid to:", paidTo);
+    mutation.mutate();
   };
 
   return (

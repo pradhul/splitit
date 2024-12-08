@@ -11,8 +11,62 @@ import {
   DOCUMENT_LIMIT,
   GET_ALL_DOCUMENTS,
   GET_DOCUMENTS_BATCH,
+  SAVE_DOCUMENTS,
 } from "@/apis/constants";
 import axios from "axios";
+import { auth } from "@/firebaseConfig";
+import RecentTransactions from "../app/RecordPayment/RecentTransactions/RecentTransactions";
+
+const getAuthToken = async () => {
+  console.log("Getting auth token");
+  const user = auth.currentUser;
+  console.log("Getting auth token", user);
+  if (!user) throw new Error("No user signed in");
+  return user.getIdToken();
+};
+
+//test postData , to be removed later
+const postData = {
+  fields: {
+    amount: { integerValue: 100 },
+    categories: {
+      arrayValue: {
+        values: [{ stringValue: "Category1" }, { stringValue: "Category2" }],
+      },
+    },
+    to: {
+      arrayValue: {
+        values: [
+          {
+            referenceValue:
+              "projects/YOUR_PROJECT_ID/databases/(default)/documents/collectionName/docID1",
+          },
+          {
+            referenceValue:
+              "projects/YOUR_PROJECT_ID/databases/(default)/documents/collectionName/docID2",
+          },
+        ],
+      },
+    },
+  },
+};
+
+export const saveTransaction = async () => {
+  const token = await getAuthToken();
+  console.log(
+    "Saving transaction to",
+    `${SAVE_DOCUMENTS}${collectionNames.transactions}`
+  );
+  return axios
+    .post(`${SAVE_DOCUMENTS}${collectionNames.transactions}`, postData, {
+      headers: {
+        "Content-Type": "Application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => console.log("OK", response))
+    .catch((error) => console.error("Error", error));
+};
 
 export const getRecentTransactions = () =>
   axios
@@ -118,7 +172,6 @@ async function transformFireStoreRecord(record: FireStoreRecord) {
   );
   return flattenArrays(result);
 }
-
 
 /**
  * Flattens arrays of objects into a single array of values

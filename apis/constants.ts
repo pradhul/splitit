@@ -12,6 +12,7 @@ const GET_BATCH_DOCUMENTS = "documents:batchGet";
 
 export const GET_ALL_DOCUMENTS = `${BASE_URL}${RUN_QUERY_DOCUMENTS}`;
 export const GET_DOCUMENTS_BATCH = `${BASE_URL}${GET_BATCH_DOCUMENTS}`;
+export const SAVE_DOCUMENTS = `${BASE_URL}documents/`;
 export const DOCUMENT_LIMIT = 10;
 
 export const collectionNames = {
