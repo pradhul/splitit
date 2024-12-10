@@ -28,7 +28,10 @@ export default function PaymentOptions({
         <Text>To</Text>
         <View style={styles.paymentParties}>
           <TagGroup multiselect onTagChange={updatePaymentTo}>
-            <Tag type="user" text="Person 1" />
+            <Tag
+              type="user"
+              text="projects/groupbill-f9c8d/databases/(default)/documents/users/5XM8nNSpEtKlucYHXdLJ" //FIXME remove this, and implement logic for sending any info from inside
+            />
           </TagGroup>
         </View>
       </View>

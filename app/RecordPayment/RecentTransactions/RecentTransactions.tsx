@@ -10,7 +10,7 @@ import {
 import RecentsListItem from "../RecentsListItem";
 import { Margins, FontSize, Paddings } from "@/constants/Dimensions";
 import { Colors } from "@/constants/Colors";
-import { ITransaction } from "@/app/features/transactionSlice";
+import { ITransaction } from "@/types/transactions";
 
 interface IRecentTransactions {
   isPending: boolean;

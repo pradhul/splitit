@@ -20,7 +20,11 @@ export default function RootLayout() {
         <Stack
           screenOptions={{ headerShown: true, title: Titles.recordPaymentPage }}
         >
-          <Stack.Screen name="index" />
+          <Stack.Screen name="index" options={{ title: "Welcome!" }} />
+          <Stack.Screen
+            name="RecordPayment"
+            options={{ title: Titles.recordPaymentPage }}
+          />
         </Stack>
         <DevToolsBubble />
       </QueryClientProvider>

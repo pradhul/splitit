@@ -9,13 +9,15 @@
 import {
   collectionNames,
   DOCUMENT_LIMIT,
+  DOCUMENT_REFERENCE_BASE,
   GET_ALL_DOCUMENTS,
   GET_DOCUMENTS_BATCH,
   SAVE_DOCUMENTS,
+  regEx,
 } from "@/apis/constants";
 import axios from "axios";
 import { auth } from "@/firebaseConfig";
-import RecentTransactions from "../app/RecordPayment/RecentTransactions/RecentTransactions";
+import { ITransaction } from "@/types/transactions";
 
 const getAuthToken = async () => {
   console.log("Getting auth token");
@@ -38,12 +40,10 @@ const postData = {
       arrayValue: {
         values: [
           {
-            referenceValue:
-              "projects/YOUR_PROJECT_ID/databases/(default)/documents/collectionName/docID1",
+            referenceValue: `projects/${process.env.EXPO_PUBLIC_PROJECTID}/databases/(default)/documents/collectionName/docID1`,
           },
           {
-            referenceValue:
-              "projects/YOUR_PROJECT_ID/databases/(default)/documents/collectionName/docID2",
+            referenceValue: `projects/${process.env.EXPO_PUBLIC_PROJECTID}/databases/(default)/documents/collectionName/docID2`,
           },
         ],
       },
@@ -51,21 +51,43 @@ const postData = {
   },
 };
 
-export const saveTransaction = async () => {
+interface ITransactionPayload
+  extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
+export const saveTransaction = async (
+  transactionPayload: ITransactionPayload
+) => {
   const token = await getAuthToken();
   console.log(
     "Saving transaction to",
     `${SAVE_DOCUMENTS}${collectionNames.transactions}`
   );
+
+  const userId = auth.currentUser?.uid;
+  const from = userId
+    ? `${DOCUMENT_REFERENCE_BASE}${collectionNames.users}/${userId}`
+    : ""; //FIXME if userId undefined, we should not proceed
+  const timestamp = new Date().toISOString();
+  const transaction: ITransaction = {
+    ...transactionPayload,
+    _created: timestamp,
+    _modified: timestamp,
+    from,
+  };
+  console.log("PostData before transform", transaction);
+  const t = transformToFireStoreRecord(transaction);
+  console.log("PostData after transform", t);
   return axios
-    .post(`${SAVE_DOCUMENTS}${collectionNames.transactions}`, postData, {
+    .post(`${SAVE_DOCUMENTS}${collectionNames.transactions}`, t, {
       headers: {
         "Content-Type": "Application/json",
         Authorization: `Bearer ${token}`,
       },
     })
     .then((response) => console.log("OK", response))
-    .catch((error) => console.error("Error", error));
+    .catch((error) => {
+      console.log("Error", error);
+      throw new Error(error);
+    });
 };
 
 export const getRecentTransactions = () =>
@@ -91,7 +113,7 @@ export const getRecentTransactions = () =>
     .then(async (response) => {
       return await Promise.all(
         response.data.map((record: any) => {
-          return transformFireStoreRecord(record.document.fields);
+          return transformFromFireStoreRecord(record.document.fields);
         })
       );
     });
@@ -137,7 +159,7 @@ function isFireStoreField(fieldName: string): fieldName is FireStoreField {
  * Changes a firestore document to usable app objects
  * by changing them to {key:value} and getting readable names from reference objects
  **/
-async function transformFireStoreRecord(record: FireStoreRecord) {
+async function transformFromFireStoreRecord(record: FireStoreRecord) {
   const keys = Object.keys(record);
   const result = await keys.reduce(
     async (accPromise: Promise<Record<string, any>>, key) => {
@@ -157,7 +179,7 @@ async function transformFireStoreRecord(record: FireStoreRecord) {
         } else if (fireStoreFieldName === "arrayValue") {
           acc[key.trim()] = await Promise.all(
             (fireStoreFieldObject[fireStoreFieldName].values as any[]).map(
-              (value) => transformFireStoreRecord({ [key.trim()]: value })
+              (value) => transformFromFireStoreRecord({ [key.trim()]: value })
             )
           );
         } else {
@@ -188,3 +210,73 @@ function flattenArrays(result: Record<string, any>): any {
   return flattened;
 }
 
+/**
+ * Converts simple JSON values into FireStore Compatible objects
+ * @param isTopLevelCallable Determine whether the call is top-level of self call in order to
+ * wrap the results in fields object for firestore compatibility before returning the results back
+ */
+function transformToFireStoreRecord(
+  record: any,
+  isTopLevelCall = true
+): FireStoreRecord {
+  const firestoreRecord: FireStoreRecord = {};
+  Object.keys(record).forEach((key) => {
+    const type = getFirestoreType(record, key);
+    console.log("Firestore type of  ", key, "----------->", type);
+    switch (type) {
+      case "integerValue": {
+        firestoreRecord[key] = { integerValue: record[key] };
+        break;
+      }
+      case "stringValue": {
+        firestoreRecord[key] = { stringValue: record[key] };
+        break;
+      }
+      case "referenceValue": {
+        firestoreRecord[key] = { referenceValue: record[key] };
+        break;
+      }
+      case "timestampValue": {
+        firestoreRecord[key] = { timestampValue: record[key] };
+        break;
+      }
+      case "arrayValue": {
+        firestoreRecord[key] = {
+          arrayValue: {
+            values: record[key].map(
+              (item: any) => transformToFireStoreRecord({ item }, false)[`item`]
+            ),
+          },
+        };
+        break;
+      }
+    }
+  });
+  return isTopLevelCall ? { fields: firestoreRecord } : firestoreRecord;
+}
+
+function getFirestoreType(record: Record<string, any>, key: string) {
+  const value = record[key];
+  const type = Object.prototype.toString.call(value);
+
+  switch (type) {
+    case "[object Number]":
+      return "integerValue";
+    case "[object String]": {
+      if (typeof value === "string") {
+        if (regEx.firestoreReference.test(value)) {
+          return "referenceValue";
+        }
+        if (regEx.isoDateTime.test(value)) {
+          return "timestampValue";
+        }
+        return "stringValue";
+      }
+    }
+    case "[object Array]":
+      return "arrayValue";
+    case "[object Object]":
+    default:
+      return "unIdentified";
+  }
+}

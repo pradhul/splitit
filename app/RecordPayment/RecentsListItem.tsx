@@ -7,7 +7,7 @@
  */
 import { Margins, Paddings } from "@/constants/Dimensions";
 import { StyleSheet, View, Text } from "react-native";
-import { ITransaction } from "@/app/features/transactionSlice";
+import { ITransaction } from "@/types/transactions";
 import { Colors } from "@/constants/Colors";
 
 interface IRecentItem extends Omit<ITransaction, "_modified"> {}

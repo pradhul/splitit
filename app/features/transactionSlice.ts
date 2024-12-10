@@ -1,13 +1,5 @@
+import { ITransaction } from "@/types/transactions";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface ITransaction {
-  _created: string;
-  _modified: string;
-  amount: number;
-  category: string;
-  from: string;
-  to: string;
-}
 
 const initialState: ITransaction[] | [] = [];
 
