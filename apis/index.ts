@@ -19,53 +19,20 @@ import axios from "axios";
 import { auth } from "@/firebaseConfig";
 import { ITransaction } from "@/types/transactions";
 
-const getAuthToken = async () => {
-  console.log("Getting auth token");
-  const user = auth.currentUser;
-  console.log("Getting auth token", user);
-  if (!user) throw new Error("No user signed in");
-  return user.getIdToken();
-};
+interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
+type FireStoreStringField = "stringValue" | "referenceValue" | "timestampValue" | "arrayValue";
+type FireStoreNumberField = "integerValue";
+type FireStoreField = FireStoreStringField | FireStoreNumberField;
+type FireStoreRecord =
+  | {
+      [key: string]: { [name: string]: string };
+    }
+  | { [key: string]: { values: { [dynamicKey: string]: string }[] } };
 
-//test postData , to be removed later
-const postData = {
-  fields: {
-    amount: { integerValue: 100 },
-    categories: {
-      arrayValue: {
-        values: [{ stringValue: "Category1" }, { stringValue: "Category2" }],
-      },
-    },
-    to: {
-      arrayValue: {
-        values: [
-          {
-            referenceValue: `projects/${process.env.EXPO_PUBLIC_PROJECTID}/databases/(default)/documents/collectionName/docID1`,
-          },
-          {
-            referenceValue: `projects/${process.env.EXPO_PUBLIC_PROJECTID}/databases/(default)/documents/collectionName/docID2`,
-          },
-        ],
-      },
-    },
-  },
-};
-
-interface ITransactionPayload
-  extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
-export const saveTransaction = async (
-  transactionPayload: ITransactionPayload
-) => {
-  const token = await getAuthToken();
-  console.log(
-    "Saving transaction to",
-    `${SAVE_DOCUMENTS}${collectionNames.transactions}`
-  );
-
+export const saveTransaction = async (transactionPayload: ITransactionPayload) => {
+  const token = await _getAuthToken();
   const userId = auth.currentUser?.uid;
-  const from = userId
-    ? `${DOCUMENT_REFERENCE_BASE}${collectionNames.users}/${userId}`
-    : ""; //FIXME if userId undefined, we should not proceed
+  const from = userId ? `${DOCUMENT_REFERENCE_BASE}${collectionNames.users}/${userId}` : ""; //FIXME if userId undefined, we should not proceed
   const timestamp = new Date().toISOString();
   const transaction: ITransaction = {
     ...transactionPayload,
@@ -73,19 +40,20 @@ export const saveTransaction = async (
     _modified: timestamp,
     from,
   };
-  console.log("PostData before transform", transaction);
-  const t = transformToFireStoreRecord(transaction);
-  console.log("PostData after transform", t);
+
   return axios
-    .post(`${SAVE_DOCUMENTS}${collectionNames.transactions}`, t, {
-      headers: {
-        "Content-Type": "Application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((response) => console.log("OK", response))
+    .post(
+      `${SAVE_DOCUMENTS}${collectionNames.transactions}`,
+      _transformToFireStoreRecord(transaction),
+      {
+        headers: {
+          "Content-Type": "Application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((response) => console.log("Successfully Saved Transaction"))
     .catch((error) => {
-      console.log("Error", error);
       throw new Error(error);
     });
 };
@@ -113,17 +81,25 @@ export const getRecentTransactions = () =>
     .then(async (response) => {
       return await Promise.all(
         response.data.map((record: any) => {
-          return transformFromFireStoreRecord(record.document.fields);
+          return _transformFromFireStoreRecord(record.document.fields);
         })
       );
     });
+
+/** Internal Methods */
+
+const _getAuthToken = async () => {
+  const user = auth.currentUser;
+  if (!user) throw new Error("No user is signed in");
+  return user.getIdToken();
+};
 
 /**
  * Gets Documents in batches
  * FIXME: This now returns specifically the name field under a firestore reference,
  * and only returns the first one
  */
-const getDocumentsBatch = (documents: string[]) =>
+const _getDocumentsBatch = (documents: string[]) =>
   axios
     .post(GET_DOCUMENTS_BATCH, {
       documents,
@@ -132,20 +108,18 @@ const getDocumentsBatch = (documents: string[]) =>
       return response.data[0].found.fields.name.stringValue;
     });
 
-type FireStoreStringField =
-  | "stringValue"
-  | "referenceValue"
-  | "timestampValue"
-  | "arrayValue";
-type FireStoreNumberField = "integerValue";
-type FireStoreField = FireStoreStringField | FireStoreNumberField;
-type FireStoreRecord =
-  | {
-      [key: string]: { [name: string]: string };
-    }
-  | { [key: string]: { values: { [dynamicKey: string]: string }[] } };
-
-function isFireStoreField(fieldName: string): fieldName is FireStoreField {
+/**
+ * Determines if a given field name is a valid Firestore field type.
+ *
+ * This function acts as a type guard to check if the provided field name
+ * corresponds to one of the supported Firestore field types.
+ *
+ * @param fieldName - The name of the field to check.
+ * @returns A boolean indicating whether the field name is a valid Firestore field type.
+ *          Returns true if the fieldName is one of: "stringValue", "referenceValue",
+ *          "timestampValue", "integerValue", or "arrayValue". Otherwise, returns false.
+ */
+function _isFireStoreField(fieldName: string): fieldName is FireStoreField {
   return (
     fieldName === "stringValue" ||
     fieldName === "referenceValue" ||
@@ -159,46 +133,41 @@ function isFireStoreField(fieldName: string): fieldName is FireStoreField {
  * Changes a firestore document to usable app objects
  * by changing them to {key:value} and getting readable names from reference objects
  **/
-async function transformFromFireStoreRecord(record: FireStoreRecord) {
+async function _transformFromFireStoreRecord(record: FireStoreRecord) {
   const keys = Object.keys(record);
-  const result = await keys.reduce(
-    async (accPromise: Promise<Record<string, any>>, key) => {
-      const acc = await Promise.resolve(accPromise);
-      const fireStoreFieldName = Object.keys(record[key])[0] as FireStoreField;
-      const fireStoreFieldObject = record[key] as {
-        [key in FireStoreField]: any;
-      };
-      if (isFireStoreField(fireStoreFieldName)) {
-        if (fireStoreFieldName === "integerValue") {
-          acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
-        } else if (fireStoreFieldName === "referenceValue") {
-          const readableName = await getDocumentsBatch([
-            fireStoreFieldObject[fireStoreFieldName],
-          ]);
-          acc[key.trim()] = readableName;
-        } else if (fireStoreFieldName === "arrayValue") {
-          acc[key.trim()] = await Promise.all(
-            (fireStoreFieldObject[fireStoreFieldName].values as any[]).map(
-              (value) => transformFromFireStoreRecord({ [key.trim()]: value })
-            )
-          );
-        } else {
-          acc[key.trim()] = fireStoreFieldObject[fireStoreFieldName];
-        }
+  const result = await keys.reduce(async (accPromise: Promise<Record<string, any>>, key) => {
+    const acc = await Promise.resolve(accPromise);
+    const fireStoreFieldName = Object.keys(record[key])[0] as FireStoreField;
+    const fireStoreFieldObject = record[key] as {
+      [key in FireStoreField]: any;
+    };
+    if (_isFireStoreField(fireStoreFieldName)) {
+      if (fireStoreFieldName === "integerValue") {
+        acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
+      } else if (fireStoreFieldName === "referenceValue") {
+        const readableName = await _getDocumentsBatch([fireStoreFieldObject[fireStoreFieldName]]);
+        acc[key.trim()] = readableName;
+      } else if (fireStoreFieldName === "arrayValue") {
+        acc[key.trim()] = await Promise.all(
+          (fireStoreFieldObject[fireStoreFieldName].values as any[]).map((value) =>
+            _transformFromFireStoreRecord({ [key.trim()]: value })
+          )
+        );
       } else {
-        throw Error("Not Firestore Data");
+        acc[key.trim()] = fireStoreFieldObject[fireStoreFieldName];
       }
-      return acc;
-    },
-    Promise.resolve({})
-  );
-  return flattenArrays(result);
+    } else {
+      throw Error("Data Not in Firestore Record Structure!");
+    }
+    return acc;
+  }, Promise.resolve({}));
+  return _flattenArrays(result);
 }
 
 /**
  * Flattens arrays of objects into a single array of values
  */
-function flattenArrays(result: Record<string, any>): any {
+function _flattenArrays(result: Record<string, any>): any {
   const flattened: Record<string, any> = {};
   Object.keys(result).forEach((key) => {
     if (Array.isArray(result[key])) {
@@ -215,14 +184,10 @@ function flattenArrays(result: Record<string, any>): any {
  * @param isTopLevelCallable Determine whether the call is top-level of self call in order to
  * wrap the results in fields object for firestore compatibility before returning the results back
  */
-function transformToFireStoreRecord(
-  record: any,
-  isTopLevelCall = true
-): FireStoreRecord {
+function _transformToFireStoreRecord(record: any, isTopLevelCall = true): FireStoreRecord {
   const firestoreRecord: FireStoreRecord = {};
   Object.keys(record).forEach((key) => {
-    const type = getFirestoreType(record, key);
-    console.log("Firestore type of  ", key, "----------->", type);
+    const type = _getFirestoreType(record, key);
     switch (type) {
       case "integerValue": {
         firestoreRecord[key] = { integerValue: record[key] };
@@ -244,7 +209,7 @@ function transformToFireStoreRecord(
         firestoreRecord[key] = {
           arrayValue: {
             values: record[key].map(
-              (item: any) => transformToFireStoreRecord({ item }, false)[`item`]
+              (item: any) => _transformToFireStoreRecord({ item }, false)["item"]
             ),
           },
         };
@@ -255,7 +220,20 @@ function transformToFireStoreRecord(
   return isTopLevelCall ? { fields: firestoreRecord } : firestoreRecord;
 }
 
-function getFirestoreType(record: Record<string, any>, key: string) {
+/**
+ * Determines the Firestore field type for a given value in a record.
+ *
+ * @param record - An object containing key-value pairs to be analyzed.
+ * @param key - The specific key in the record whose value type needs to be determined.
+ * @returns A string representing the Firestore field type:
+ *          - "integerValue" for numbers
+ *          - "referenceValue" for strings matching a Firestore reference pattern
+ *          - "timestampValue" for strings in ISO date-time format
+ *          - "stringValue" for other strings
+ *          - "arrayValue" for arrays
+ *          - "unIdentified" for objects or any other type
+ */
+function _getFirestoreType(record: Record<string, any>, key: string) {
   const value = record[key];
   const type = Object.prototype.toString.call(value);
 
