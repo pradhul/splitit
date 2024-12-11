@@ -19,7 +19,6 @@ export default function Registration() {
   useEffect(() => {
     if (response?.type === "success") {
       const { id_token } = response.params;
-      console.log("Google Sign-In response:", JSON.stringify(response));
       const credentials = GoogleAuthProvider.credential(id_token);
 
       if (!id_token) {

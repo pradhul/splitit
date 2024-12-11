@@ -32,7 +32,11 @@ type FireStoreRecord =
 export const saveTransaction = async (transactionPayload: ITransactionPayload) => {
   const token = await _getAuthToken();
   const userId = auth.currentUser?.uid;
-  const from = userId ? `${DOCUMENT_REFERENCE_BASE}${collectionNames.users}/${userId}` : ""; //FIXME if userId undefined, we should not proceed
+  if (!userId) {
+    console.error("No user is logged in!");
+    throw new Error();
+  }
+  const from = userId ? `${DOCUMENT_REFERENCE_BASE}${collectionNames.users}/${userId}` : "";
   const timestamp = new Date().toISOString();
   const transaction: ITransaction = {
     ...transactionPayload,
@@ -100,8 +104,8 @@ const _getAuthToken = async () => {
 
 /**
  * Gets Documents in batches
- * FIXME: This now returns specifically the name field under a firestore reference,
- * and only returns the first one
+ * @param {string} documents[] : an array of reference paths to the documents needed to be retrieved, 
+ * mut confirm to @see regEx.firestoreReference
  */
 const _getDocumentsBatch = (documents: string[]) =>
   axios
