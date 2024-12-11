@@ -14,11 +14,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { getRecentTransactions, saveTransaction } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import React, { useEffect, useState } from "react";
-import { addTransaction, setTransactions } from "../features/transactionSlice";
+import { setTransactions } from "../features/transactionSlice";
 import PaymentOptions from "@/app/RecordPayment/PaymentOptions";
 import RecentTransactions from "@/app/RecordPayment/RecentTransactions/RecentTransactions";
 import { RecordPaymentPage } from "@/constants/Strings";
-import { router } from "expo-router";
 
 export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
