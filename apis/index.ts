@@ -82,14 +82,16 @@ export const getRecentTransactions = () =>
         limit: DOCUMENT_LIMIT,
       },
     })
-    .then(async (response) => {
-      const result = await Promise.all(
-        response.data.map((record: any) => {
-          return _transformFromFireStoreRecord(record.document.fields);
-        })
-      );
-      return result;
-    })
+    .then(
+      async (response) =>
+        await Promise.all(
+          response.data.map(async ({ document: { fields, name } }: any) => {
+            const docId = name.split("/").pop();
+            const transformed = await _transformFromFireStoreRecord(fields);
+            return { ...transformed, docId };
+          })
+        )
+    )
     .catch((error) => {
       throw new Error(error);
     });
