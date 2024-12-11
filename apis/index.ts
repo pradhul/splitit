@@ -79,11 +79,15 @@ export const getRecentTransactions = () =>
       },
     })
     .then(async (response) => {
-      return await Promise.all(
+      const result = await Promise.all(
         response.data.map((record: any) => {
           return _transformFromFireStoreRecord(record.document.fields);
         })
       );
+      return result;
+    })
+    .catch((error) => {
+      throw new Error(error);
     });
 
 /** Internal Methods */
@@ -105,7 +109,14 @@ const _getDocumentsBatch = (documents: string[]) =>
       documents,
     })
     .then((response) => {
-      return response.data[0].found.fields.name.stringValue;
+      if (!response || !response.data || !response.data[0].found) {
+        throw new Error("Batch request Failed, response is Empty or No documents found");
+      }
+      return response.data[0]?.found?.fields?.name?.stringValue;
+    })
+    .catch((err) => {
+      console.error("Error in batch response", err);
+      return "";
     });
 
 /**
@@ -135,33 +146,37 @@ function _isFireStoreField(fieldName: string): fieldName is FireStoreField {
  **/
 async function _transformFromFireStoreRecord(record: FireStoreRecord) {
   const keys = Object.keys(record);
-  const result = await keys.reduce(async (accPromise: Promise<Record<string, any>>, key) => {
-    const acc = await Promise.resolve(accPromise);
-    const fireStoreFieldName = Object.keys(record[key])[0] as FireStoreField;
-    const fireStoreFieldObject = record[key] as {
-      [key in FireStoreField]: any;
-    };
-    if (_isFireStoreField(fireStoreFieldName)) {
-      if (fireStoreFieldName === "integerValue") {
-        acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
-      } else if (fireStoreFieldName === "referenceValue") {
-        const readableName = await _getDocumentsBatch([fireStoreFieldObject[fireStoreFieldName]]);
-        acc[key.trim()] = readableName;
-      } else if (fireStoreFieldName === "arrayValue") {
-        acc[key.trim()] = await Promise.all(
-          (fireStoreFieldObject[fireStoreFieldName].values as any[]).map((value) =>
-            _transformFromFireStoreRecord({ [key.trim()]: value })
-          )
-        );
+  try {
+    const result = await keys.reduce(async (accPromise: Promise<Record<string, any>>, key) => {
+      const acc = await Promise.resolve(accPromise);
+      const fireStoreFieldName = Object.keys(record[key])[0] as FireStoreField;
+      const fireStoreFieldObject = record[key] as {
+        [key in FireStoreField]: any;
+      };
+      if (_isFireStoreField(fireStoreFieldName)) {
+        if (fireStoreFieldName === "integerValue") {
+          acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
+        } else if (fireStoreFieldName === "referenceValue") {
+          const readableName = await _getDocumentsBatch([fireStoreFieldObject[fireStoreFieldName]]);
+          acc[key.trim()] = readableName;
+        } else if (fireStoreFieldName === "arrayValue") {
+          acc[key.trim()] = await Promise.all(
+            (fireStoreFieldObject[fireStoreFieldName].values as any[]).map((value) =>
+              _transformFromFireStoreRecord({ [key.trim()]: value })
+            )
+          );
+        } else {
+          acc[key.trim()] = fireStoreFieldObject[fireStoreFieldName];
+        }
       } else {
-        acc[key.trim()] = fireStoreFieldObject[fireStoreFieldName];
+        throw Error("Data Not in Firestore Record Structure!");
       }
-    } else {
-      throw Error("Data Not in Firestore Record Structure!");
-    }
-    return acc;
-  }, Promise.resolve({}));
-  return _flattenArrays(result);
+      return acc;
+    }, Promise.resolve({}));
+    return _flattenArrays(result);
+  } catch (err) {
+    console.error("Error Occurred Transforming Record From Firestore", err);
+  }
 }
 
 /**
