@@ -107,7 +107,7 @@ const _getAuthToken = async () => {
 /**
  * Gets Documents in batches
  * @param {string} documents[] : an array of reference paths to the documents needed to be retrieved, 
- * mut confirm to @see regEx.firestoreReference
+ * must confirm to firestoreReference RegEx @see regEx.firestoreReference
  */
 const _getDocumentsBatch = (documents: string[]) =>
   axios
