@@ -18,7 +18,7 @@ import {
 import axios from "axios";
 import { auth } from "@/firebaseConfig";
 import { ITransaction } from "@/types/transactions";
-import { getFilteredDocuments } from "./axiosService";
+import { getFilteredDocuments } from "./FirestoreService";
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
 type FireStoreStringField = "stringValue" | "referenceValue" | "timestampValue" | "arrayValue";
