@@ -6,6 +6,7 @@
  */
 import axios from "axios";
 import { GET_ALL_DOCUMENTS, collectionNames, DOCUMENT_LIMIT } from "./constants";
+import ApiClient from "./ApiClient";
 
 type Direction = "ASCENDING" | "DESCENDING";
 type URL = string;
@@ -44,11 +45,30 @@ export const getFilteredDocuments = (
     ],
     limit,
   };
-  return axios
-    .post(url, { structuredQuery })
+  return ApiClient.post(url, { structuredQuery })
     .then(async (response) => response)
     .catch((error) => {
       console.error("Error fetching documents", error);
       throw new Error(error);
     });
 };
+
+/**
+ * Gets Documents in batches
+ * @param {string} documents[] : an array of reference paths to the documents needed to be retrieved,
+ * must confirm to firestoreReference RegEx @see regEx.firestoreReference
+ */
+export const getDocumentsBatch = (url: URL, documents: string[]) =>
+  ApiClient.post(url, {
+    documents,
+  })
+    .then((response) => {
+      if (!response || !response.data || !response.data[0].found) {
+        throw new Error("Batch request Failed, response is Empty or No documents found");
+      }
+      return response.data[0]?.found?.fields;
+    })
+    .catch((err) => {
+      console.error("Error in batch response", err);
+      return "";
+    });

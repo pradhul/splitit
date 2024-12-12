@@ -18,7 +18,7 @@ import {
 import axios from "axios";
 import { auth } from "@/firebaseConfig";
 import { ITransaction } from "@/types/transactions";
-import { getFilteredDocuments } from "./FirestoreService";
+import { getDocumentsBatch, getFilteredDocuments } from "./FirestoreService";
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
 type FireStoreStringField = "stringValue" | "referenceValue" | "timestampValue" | "arrayValue";
@@ -101,26 +101,6 @@ const _getAuthToken = async () => {
   return user.getIdToken();
 };
 
-/**
- * Gets Documents in batches
- * @param {string} documents[] : an array of reference paths to the documents needed to be retrieved, 
- * must confirm to firestoreReference RegEx @see regEx.firestoreReference
- */
-const _getDocumentsBatch = (documents: string[]) =>
-  axios
-    .post(GET_DOCUMENTS_BATCH, {
-      documents,
-    })
-    .then((response) => {
-      if (!response || !response.data || !response.data[0].found) {
-        throw new Error("Batch request Failed, response is Empty or No documents found");
-      }
-      return response.data[0]?.found?.fields;
-    })
-    .catch((err) => {
-      console.error("Error in batch response", err);
-      return { name: { stringValue: "" } };
-    });
 
 /**
  * Determines if a given field name is a valid Firestore field type.
@@ -160,8 +140,10 @@ async function _transformFromFireStoreRecord(record: FireStoreRecord) {
         if (fireStoreFieldName === "integerValue") {
           acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
         } else if (fireStoreFieldName === "referenceValue") {
-          const result = await _getDocumentsBatch([fireStoreFieldObject[fireStoreFieldName]]);
-          const readableName = result?.name?.stringValue;
+          const result = await getDocumentsBatch(GET_DOCUMENTS_BATCH, [
+            fireStoreFieldObject[fireStoreFieldName],
+          ]);
+          const readableName = result?.name?.stringValue || "";
           acc[key.trim()] = readableName;
         } else if (fireStoreFieldName === "arrayValue") {
           acc[key.trim()] = await Promise.all(

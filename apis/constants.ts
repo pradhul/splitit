@@ -6,12 +6,14 @@
  * @desc [description]
  */
 
-const BASE_URL = `${process.env.EXPO_PUBLIC_FIRESTORE_URL}${process.env.EXPO_PUBLIC_PROJECTID}/databases/(default)/`;
+export const BASE_URL = `${process.env.EXPO_PUBLIC_FIRESTORE_URL}${process.env.EXPO_PUBLIC_PROJECTID}/databases/(default)/`;
+export const DEFAULT_REQUEST_TIMEOUT = 5000;
+export const DEFAULT_TIMEOUT_ERROR = "Request timed out";
+
 const RUN_QUERY_DOCUMENTS = "documents:runQuery";
 const GET_BATCH_DOCUMENTS = "documents:batchGet";
-
-export const GET_ALL_DOCUMENTS = `${BASE_URL}${RUN_QUERY_DOCUMENTS}`;
-export const GET_DOCUMENTS_BATCH = `${BASE_URL}${GET_BATCH_DOCUMENTS}`;
+export const GET_ALL_DOCUMENTS = RUN_QUERY_DOCUMENTS;
+export const GET_DOCUMENTS_BATCH = GET_BATCH_DOCUMENTS;
 export const SAVE_DOCUMENTS = `${BASE_URL}documents/`;
 export const DOCUMENT_LIMIT = 10;
 export const DOCUMENT_REFERENCE_BASE = `projects/${process.env.EXPO_PUBLIC_PROJECTID}/databases/(default)/documents/`;
