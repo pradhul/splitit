@@ -18,6 +18,7 @@ import {
 import axios from "axios";
 import { auth } from "@/firebaseConfig";
 import { ITransaction } from "@/types/transactions";
+import { getFilteredDocuments } from "./axiosService";
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
 type FireStoreStringField = "stringValue" | "referenceValue" | "timestampValue" | "arrayValue";
@@ -62,39 +63,35 @@ export const saveTransaction = async (transactionPayload: ITransactionPayload) =
     });
 };
 
-export const getRecentTransactions = () =>
-  axios
-    .post(GET_ALL_DOCUMENTS, {
-      structuredQuery: {
-        from: [
-          {
-            collectionId: collectionNames.transactions,
-          },
-        ],
-        orderBy: [
-          {
-            field: {
-              fieldPath: "_created",
-            },
-            direction: "DESCENDING",
-          },
-        ],
-        limit: DOCUMENT_LIMIT,
-      },
+/**
+ * Retrieves and processes recent transactions from Firestore.
+ *
+ * This function fetches the most recent transactions from the Firestore database,
+ * transforms the raw Firestore data into a more usable format, and adds a document ID
+ * to each transaction record.
+ *
+ * @async
+ * @returns {Promise<Array<Object>>} A promise that resolves to an array of transaction objects.
+ *                                   Each object contains the transformed transaction data
+ *                                   along with its corresponding document ID.
+ * @throws {Error} If there's an issue with fetching or processing the transaction data.
+ */
+export const getRecentTransactions = async () => {
+  const response = await getFilteredDocuments(
+    GET_ALL_DOCUMENTS,
+    collectionNames.transactions,
+    "_created",
+    DOCUMENT_LIMIT
+  );
+
+  return await Promise.all(
+    response.data.map(async ({ document: { fields, name } }: any) => {
+      const docId = name.split("/").pop();
+      const transformed = await _transformFromFireStoreRecord(fields);
+      return { ...transformed, docId };
     })
-    .then(
-      async (response) =>
-        await Promise.all(
-          response.data.map(async ({ document: { fields, name } }: any) => {
-            const docId = name.split("/").pop();
-            const transformed = await _transformFromFireStoreRecord(fields);
-            return { ...transformed, docId };
-          })
-        )
-    )
-    .catch((error) => {
-      throw new Error(error);
-    });
+  );
+};
 
 /** Internal Methods */
 
