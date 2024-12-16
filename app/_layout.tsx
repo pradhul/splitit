@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 const queryClient = new QueryClient();
 
-//FIXME even though the loading screen is implemented here it wont work properly
+//FIXME: even though the loading screen is implemented here it wont work properly
 // there needs to be an additional _layout screen to protect the authenticated screens from rendering
 // @see https://docs.expo.dev/router/reference/authentication/#using-react-context-and-route-groups
 export default function RootLayout() {

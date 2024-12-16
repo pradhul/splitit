@@ -14,7 +14,7 @@ const RUN_QUERY_DOCUMENTS = "documents:runQuery";
 const GET_BATCH_DOCUMENTS = "documents:batchGet";
 export const GET_ALL_DOCUMENTS = RUN_QUERY_DOCUMENTS;
 export const GET_DOCUMENTS_BATCH = GET_BATCH_DOCUMENTS;
-export const SAVE_DOCUMENTS = `${BASE_URL}documents/`;
+export const SAVE_DOCUMENTS = `documents/`;
 export const DOCUMENT_LIMIT = 10;
 export const DOCUMENT_REFERENCE_BASE = `projects/${process.env.EXPO_PUBLIC_PROJECTID}/databases/(default)/documents/`;
 

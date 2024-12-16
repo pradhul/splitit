@@ -15,10 +15,9 @@ import {
   SAVE_DOCUMENTS,
   regEx,
 } from "@/apis/constants";
-import axios from "axios";
 import { auth } from "@/firebaseConfig";
 import { ITransaction } from "@/types/transactions";
-import { getDocumentsBatch, getFilteredDocuments } from "./FirestoreService";
+import { getDocumentsBatch, getFilteredDocuments, saveDocument } from "./FirestoreService";
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
 type FireStoreStringField = "stringValue" | "referenceValue" | "timestampValue" | "arrayValue";
@@ -31,7 +30,6 @@ type FireStoreRecord =
   | { [key: string]: { values: { [dynamicKey: string]: string }[] } };
 
 export const saveTransaction = async (transactionPayload: ITransactionPayload) => {
-  const token = await _getAuthToken();
   const userId = auth.currentUser?.uid;
   if (!userId) {
     console.error("No user is logged in!");
@@ -46,21 +44,11 @@ export const saveTransaction = async (transactionPayload: ITransactionPayload) =
     from,
   };
 
-  return axios
-    .post(
-      `${SAVE_DOCUMENTS}${collectionNames.transactions}`,
-      _transformToFireStoreRecord(transaction),
-      {
-        headers: {
-          "Content-Type": "Application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-    .then((response) => console.log("Successfully Saved Transaction"))
-    .catch((error) => {
-      throw new Error(error);
-    });
+  saveDocument(
+    `${SAVE_DOCUMENTS}${collectionNames.transactions}`,
+    _transformToFireStoreRecord(transaction)
+    // token
+  );
 };
 
 /**
@@ -91,14 +79,6 @@ export const getRecentTransactions = async () => {
       return { ...transformed, docId };
     })
   );
-};
-
-/** Internal Methods */
-
-const _getAuthToken = async () => {
-  const user = auth.currentUser;
-  if (!user) throw new Error("No user is signed in");
-  return user.getIdToken();
 };
 
 

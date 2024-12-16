@@ -30,7 +30,7 @@ export default function PaymentOptions({
           <TagGroup multiselect onTagChange={updatePaymentTo}>
             <Tag
               type="user"
-              text="projects/groupbill-f9c8d/databases/(default)/documents/users/5XM8nNSpEtKlucYHXdLJ" //FIXME remove this, and implement logic for sending any info from inside
+              text="projects/groupbill-f9c8d/databases/(default)/documents/users/5XM8nNSpEtKlucYHXdLJ" //FIXME: remove this, and implement logic for sending any info from inside
             />
           </TagGroup>
         </View>

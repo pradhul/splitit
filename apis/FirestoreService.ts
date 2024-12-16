@@ -4,8 +4,7 @@
  * @create date 2024-12-12 06:21:41
  * @modify date 2024-12-12 06:21:41
  */
-import axios from "axios";
-import { GET_ALL_DOCUMENTS, collectionNames, DOCUMENT_LIMIT } from "./constants";
+import { DOCUMENT_LIMIT } from "./constants";
 import ApiClient from "./ApiClient";
 
 type Direction = "ASCENDING" | "DESCENDING";
@@ -72,3 +71,11 @@ export const getDocumentsBatch = (url: URL, documents: string[]) =>
       console.error("Error in batch response", err);
       return "";
     });
+
+export const saveDocument = (url: URL, document: any) => {
+  return ApiClient.post(url, document)
+    .then((response) => console.log("Successfully Saved Transaction"))
+    .catch((error) => {
+      throw new Error(error);
+    });
+};
