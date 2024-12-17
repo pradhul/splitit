@@ -31,13 +31,13 @@ export default function PrimaryButton({
 
 const styles = StyleSheet.create({
   buttonPayment: {
-    backgroundColor: colors.primary1,
+    backgroundColor: colors.primary,
     padding: Paddings.large,
     borderRadius: BorderRadius.button,
     opacity: 0.9,
   },
   TextPayment: {
-    color: colors.neutral1,
+    color: colors.neutral,
     fontSize: FontSize.normal,
     textAlign: "center",
     fontWeight: "bold",

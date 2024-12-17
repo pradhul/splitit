@@ -86,17 +86,17 @@ const styles = StyleSheet.create({
   },
   transactionText: {
     fontWeight: "bold",
-    color: Colors.light.primary2,
+    color: Colors.light.primary,
     fontSize: 16,
   },
   amount: {
-    color: Colors.light.accent1,
+    color: Colors.light.accent,
   },
   from: {
-    color: Colors.light.primary2,
+    color: Colors.light.primary,
   },
   to: {
-    color: Colors.light.primary2,
+    color: Colors.light.primary,
   },
 });
 

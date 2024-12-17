@@ -11,22 +11,28 @@ import RecentsListItem from "../RecentsListItem";
 import { Margins, FontSize, Paddings } from "@/constants/Dimensions";
 import { Colors } from "@/constants/Colors";
 import { ITransaction } from "@/types/transactions";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 interface IRecentTransactions {
   isPending: boolean;
   recents: ITransaction[];
+  onRefresh: Function;
 }
 
-export default function RecentTransactions({
-  isPending,
-  recents,
-}: IRecentTransactions) {
+export default function RecentTransactions({ isPending, recents, onRefresh }: IRecentTransactions) {
   return (
     <View style={styles.recentPaymentsContainer}>
       <View style={styles.recentTitleContainer}>
         <Text style={styles.recentsTitle}>Recents</Text>
-        {isPending && (
-          <ActivityIndicator size={"small"} color={Colors.light.primary1} />
+        {isPending ? (
+          <ActivityIndicator size={"small"} color={Colors.light.primary} />
+        ) : (
+          <FontAwesome
+            onPress={() => onRefresh()}
+            style={styles.refresh}
+            name="refresh"
+            size={24}
+          />
         )}
       </View>
       <FlashList
@@ -59,9 +65,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   recentsTitle: {
-    color: Colors.light.neutral1,
+    color: Colors.light.neutral,
     fontSize: FontSize.normal,
     fontWeight: "bold",
     padding: Paddings.large,
+  },
+  refresh: {
+    // borderWidth: 1,
+    alignContent: "center",
+    color: Colors.light.primary,
   },
 });

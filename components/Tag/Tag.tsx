@@ -40,15 +40,14 @@ export default function Tag({
   } as TextStyle;
   const tagStyle = {
     ...styles.categoryTag,
-    backgroundColor: isSelected ? colors.accent1Selected : colors.accent1,
+    backgroundColor: isSelected ? colors.accentSelected : colors.accent,
     borderRadius: isCategoryType ? 40 : 100,
     paddingVertical: isCategoryType ? Paddings.normal : Paddings.large,
     flexShrink: 1,
   };
 
   const truncateText = () => {
-    const name =
-      text && text.length > 7 ? `${text.slice(0, ellipsisLimit)}...` : text;
+    const name = text && text.length > 7 ? `${text.slice(0, ellipsisLimit)}...` : text;
     return <Text style={tagTextStyle}>{name}</Text>;
   };
 
@@ -64,7 +63,7 @@ export default function Tag({
         activeOpacity={1}
         onPress={() => tagSelected()}
       >
-        <Ionicons name={iconName} size={20} color={colors.neutral1} />
+        <Ionicons name={iconName} size={20} color={colors.neutral} />
         {isCategoryType && truncateText()}
       </AnimatedTouchable>
       {!isCategoryType && truncateText()}
@@ -81,6 +80,6 @@ const styles = StyleSheet.create({
     margin: Margins.small,
   },
   tagText: {
-    color: colors.neutral1,
+    color: colors.neutral,
   },
 });

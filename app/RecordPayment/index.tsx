@@ -23,7 +23,7 @@ export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
   const dispatch = useAppDispatch();
 
-  const { isPending, isSuccess, data, error } = useQuery({
+  const { isFetching, isSuccess, data, refetch } = useQuery({
     queryKey: ["recents"],
     queryFn: getRecentTransactions,
   });
@@ -61,22 +61,16 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <View style={styles.paymentContainer}>
-        <PaymentOptions
-          updateCategories={setCategories}
-          updatePaymentTo={setPaidTo}
-        />
+        <PaymentOptions updateCategories={setCategories} updatePaymentTo={setPaidTo} />
         <PrimaryInput
           placeholder={RecordPaymentPage.rupeeSymbol}
           keyboardType="number-pad"
           inputValue={paidAmount}
           onValueChange={setPaidAmount}
         />
-        <PrimaryButton
-          title={RecordPaymentPage.recordPaymentButton}
-          onPress={recordPayment}
-        />
+        <PrimaryButton title={RecordPaymentPage.recordPaymentButton} onPress={recordPayment} />
       </View>
-      <RecentTransactions {...{ isPending, recents }} />
+      <RecentTransactions {...{ isPending: isFetching, recents, onRefresh: refetch }} />
     </View>
   );
 }

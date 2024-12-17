@@ -40,13 +40,13 @@ function PrimaryInput({
 
 const styles = StyleSheet.create({
   inputPayment: {
-    color: colors.primary1,
+    color: colors.primary,
     padding: Paddings.normal,
     textAlign: "center",
     fontSize: 50,
     marginBottom: Margins.large,
     borderBottomWidth: 0.5,
-    borderBottomColor: colors.primary1,
+    borderBottomColor: colors.primary,
   },
 });
 
