@@ -14,7 +14,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { getRecentTransactions, saveTransaction } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import React, { useEffect, useState } from "react";
-import { setTransactions } from "../features/transactionSlice";
+import { setTransactions } from "./transactionSlice";
 import PaymentOptions from "@/app/RecordPayment/PaymentOptions";
 import RecentTransactions from "@/app/RecordPayment/RecentTransactions/RecentTransactions";
 import { RecordPaymentPage } from "@/constants/Strings";

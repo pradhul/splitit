@@ -6,7 +6,7 @@
  * @desc [description]
  */
 import { configureStore } from "@reduxjs/toolkit";
-import transactionReducer from "@/app/features/transactionSlice";
+import transactionReducer from "@/app/RecordPayment/transactionSlice";
 
 export const store = configureStore({
   reducer: {
