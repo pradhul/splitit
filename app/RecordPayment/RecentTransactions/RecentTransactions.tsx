@@ -7,7 +7,7 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import RecentsListItem from "../RecentsListItem";
+import RecentsListItem from "./RecentsListItem";
 import { Margins, FontSize, Paddings } from "@/constants/Dimensions";
 import { Colors } from "@/constants/Colors";
 import { ITransaction } from "@/types/transactions";
