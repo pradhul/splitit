@@ -67,6 +67,7 @@ export default function Index() {
           keyboardType="number-pad"
           inputValue={paidAmount}
           onValueChange={setPaidAmount}
+          size="large"
         />
         <PrimaryButton title={RecordPaymentPage.recordPaymentButton} onPress={recordPayment} />
       </View>

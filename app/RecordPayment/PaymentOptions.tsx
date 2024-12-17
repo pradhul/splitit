@@ -1,4 +1,4 @@
-import { Tag, TagGroup } from "@/components/Tag";
+import { Tag, TagGroup, GeneratedTag } from "@/components/Tag";
 import { Paddings } from "@/constants/Dimensions";
 import { View, Text, StyleSheet } from "react-native";
 
@@ -6,10 +6,7 @@ interface IPaymentOptions {
   updateCategories: Function;
   updatePaymentTo: Function;
 }
-export default function PaymentOptions({
-  updateCategories,
-  updatePaymentTo,
-}: IPaymentOptions) {
+export default function PaymentOptions({ updateCategories, updatePaymentTo }: IPaymentOptions) {
   return (
     <View style={styles.paymentDetails}>
       {/* Category section*/}
@@ -20,6 +17,7 @@ export default function PaymentOptions({
             <Tag text="Fuel" />
             <Tag text="Food" />
             <Tag text="Alcohol" />
+            <GeneratedTag />
           </TagGroup>
         </View>
       </View>

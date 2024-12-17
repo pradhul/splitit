@@ -14,6 +14,7 @@ import React, {
 } from "react";
 import { View } from "react-native";
 import Tag, { ITagProps } from "./Tag";
+import GeneratedTag from "./GeneratedTag";
 
 interface ITagGroupProps {
   multiselect?: boolean;
@@ -49,17 +50,14 @@ export default function TagGroup({
   return (
     <View style={{ flexDirection: "row" }}>
       {Children.map(children, (child: React.ReactElement<ITagProps>) => {
-        if (isValidElement(child) && child.type === Tag) {
+        if ((isValidElement(child) && child.type === Tag) || child.type === GeneratedTag) {
           const isSelected = selectedTags.includes(child.props.text);
           return cloneElement(child, {
             onTagPress: () => handleTagPress(child.props.text),
             isSelected,
           });
         } else {
-          console.warn(
-            "Non <Tag/> Element Passed inside <TagGroup />",
-            child.type
-          );
+          console.warn("Non <Tag/> Element Passed inside <TagGroup />", child.type);
           return null;
         }
       })}

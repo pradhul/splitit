@@ -6,7 +6,7 @@
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
-import { Paddings, Margins } from "@/constants/Dimensions";
+import { Paddings, Margins, FontSize } from "@/constants/Dimensions";
 import React, { Dispatch, SetStateAction } from "react";
 import { StyleSheet, TextInput } from "react-native";
 
@@ -14,6 +14,7 @@ const colors = Colors.light;
 interface IPrimaryInput {
   autofocus?: boolean;
   keyboardType?: "number-pad" | "default";
+  size?: "normal" | "large";
   placeholder: string;
   inputValue: string;
   onValueChange: Dispatch<SetStateAction<string>>;
@@ -22,17 +23,20 @@ interface IPrimaryInput {
 function PrimaryInput({
   autofocus = true,
   keyboardType = "default",
+  size = "normal",
   placeholder = "",
   inputValue,
   onValueChange,
 }: React.PropsWithChildren<IPrimaryInput>) {
+  const _size = { fontSize: size === "normal" ? 14 : 50 };
+
   return (
     <TextInput
       autoFocus={autofocus}
       keyboardType={keyboardType}
       placeholder={placeholder}
       value={inputValue || ""}
-      style={styles.inputPayment}
+      style={[styles.inputPayment, _size]}
       onChangeText={(value) => onValueChange(value)}
     />
   );
@@ -43,7 +47,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     padding: Paddings.normal,
     textAlign: "center",
-    fontSize: 50,
     marginBottom: Margins.large,
     borderBottomWidth: 0.5,
     borderBottomColor: colors.primary,
