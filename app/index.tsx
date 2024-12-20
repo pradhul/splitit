@@ -1,3 +1,10 @@
+/**
+ * @author Pradhul
+ * @email pradhudev.1990@gmail.com
+ * @create date 2024-12-20 14:55:55
+ * @modify date 2024-12-20 14:55:55
+ * @desc [description]
+ */
 import PrimaryButton from "@/components/PrimaryButton";
 import { router } from "expo-router";
 import { View, Text, Button, StyleSheet } from "react-native";

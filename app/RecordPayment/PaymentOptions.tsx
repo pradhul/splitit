@@ -1,3 +1,10 @@
+/**
+ * @author Pradhul
+ * @email pradhudev.1990@gmail.com
+ * @create date 2024-12-20 14:56:08
+ * @modify date 2024-12-20 14:56:08
+ * @desc [description]
+ */
 import { Tag, TagGroup, GeneratedTag } from "@/components/Tag";
 import { Paddings } from "@/constants/Dimensions";
 import { View, Text, StyleSheet } from "react-native";

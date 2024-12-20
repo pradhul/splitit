@@ -1,3 +1,10 @@
+/**
+ * @author Pradhul
+ * @email pradhudev.1990@gmail.com
+ * @create date 2024-12-20 14:55:48
+ * @modify date 2024-12-20 14:55:48
+ * @desc [description]
+ */
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
