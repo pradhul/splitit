@@ -12,8 +12,13 @@ import { View, Text, StyleSheet } from "react-native";
 interface IPaymentOptions {
   updateCategories: Function;
   updatePaymentTo: Function;
+  getNewCategory: (name: string) => void;
 }
-export default function PaymentOptions({ updateCategories, updatePaymentTo }: IPaymentOptions) {
+export default function PaymentOptions({
+  updateCategories,
+  updatePaymentTo,
+  getNewCategory,
+}: IPaymentOptions) {
   return (
     <View style={styles.paymentDetails}>
       {/* Category section*/}
@@ -23,8 +28,7 @@ export default function PaymentOptions({ updateCategories, updatePaymentTo }: IP
           <TagGroup multiselect onTagChange={updateCategories}>
             <Tag text="Fuel" />
             <Tag text="Food" />
-            <Tag text="Alcohol" />
-            <GeneratedTag />
+            <GeneratedTag addCategory={getNewCategory} />
           </TagGroup>
         </View>
       </View>

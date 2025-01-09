@@ -72,9 +72,20 @@ export const getDocumentsBatch = (url: URL, documents: string[]) =>
       return "";
     });
 
-export const saveDocument = (url: URL, document: any) => {
-  return ApiClient.post(url, document)
-    .then((response) => console.log("Successfully Saved Transaction"))
+/**
+ * Saves a document to the specified URL. If an ID is provided, the document will be created/updated
+ * using a PATCH request. Otherwise, a new document will be created using a POST request.
+ *
+ * @param {URL} url - The URL to which the document will be saved.
+ * @param {any} document - The document to be saved.
+ * @param {string} [id] - The optional ID of the document to be updated.
+ * @returns {Promise<void>} A promise that resolves when the document is successfully saved.
+ * @throws {Error} Throws an error if the save operation fails.
+ */
+export const saveDocument = (url: URL, document: any, id?: string) => {
+  let promise = id ? ApiClient.patch(url + `/${id}`, document) : ApiClient.post(url, document);
+  return promise
+    .then((response) => console.log("Successfully Saved Document"))
     .catch((error) => {
       throw new Error(error);
     });

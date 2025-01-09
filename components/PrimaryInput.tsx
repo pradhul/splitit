@@ -17,6 +17,8 @@ interface IPrimaryInput {
   size?: "normal" | "large";
   placeholder: string;
   inputValue: string;
+  style?: object;
+  onFocused?: () => void;
   onValueChange: Dispatch<SetStateAction<string>>;
 }
 
@@ -27,6 +29,8 @@ function PrimaryInput({
   placeholder = "",
   inputValue,
   onValueChange,
+  style,
+  onFocused,
 }: React.PropsWithChildren<IPrimaryInput>) {
   const _size = { fontSize: size === "normal" ? 14 : 50 };
 
@@ -36,8 +40,9 @@ function PrimaryInput({
       keyboardType={keyboardType}
       placeholder={placeholder}
       value={inputValue || ""}
-      style={[styles.inputPayment, _size]}
+      style={[style, styles.inputPayment, _size]}
       onChangeText={(value) => onValueChange(value)}
+      onFocus={onFocused}
     />
   );
 }

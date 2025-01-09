@@ -9,7 +9,9 @@ import {
   useAnimatedStyle,
   useSharedValue,
   withSequence,
+  withDelay,
   withSpring,
+  withTiming,
 } from "react-native-reanimated";
 
 type BounceConfig = {
@@ -22,10 +24,7 @@ export function useBounce(
 ) {
   const translateY = useSharedValue(0);
   const bounce = () => {
-    translateY.value = withSequence(
-      withSpring(+5, bounceConfig),
-      withSpring(0, bounceConfig)
-    );
+    translateY.value = withSequence(withSpring(+5, bounceConfig), withSpring(0, bounceConfig));
   };
 
   const bounceStyle = useAnimatedStyle(() => ({
@@ -33,4 +32,19 @@ export function useBounce(
   }));
 
   return { bounce, bounceStyle };
+}
+
+const DELAY = 500;
+const DURATION = 1000;
+
+type DelayVisibility = "show" | "hide";
+
+export function useDelay() {
+  const opacity = useSharedValue(0);
+  const delay = (visibility: DelayVisibility) => {
+    const timingToValue = visibility === "show" ? 1 : 0;
+    opacity.value = withDelay(DELAY, withTiming(timingToValue, { duration: DURATION }));
+  };
+  const delayStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return { delay, delayStyle };
 }

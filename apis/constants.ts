@@ -21,6 +21,7 @@ export const DOCUMENT_REFERENCE_BASE = `projects/${process.env.EXPO_PUBLIC_PROJE
 export const collectionNames = {
   users: "users",
   transactions: "transactions",
+  categories: "categories",
 };
 
 export const regEx = {

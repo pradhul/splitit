@@ -1,14 +1,7 @@
-import { isPending } from "@reduxjs/toolkit";
 import { FlashList } from "@shopify/flash-list";
-import {
-  Text,
-  View,
-  ActivityIndicator,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { Text, View, ActivityIndicator, Platform, StyleSheet } from "react-native";
 import RecentsListItem from "./RecentsListItem";
-import { Margins, FontSize, Paddings } from "@/constants/Dimensions";
+import { FontSize, Paddings } from "@/constants/Dimensions";
 import { Colors } from "@/constants/Colors";
 import { ITransaction } from "@/types/transactions";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -21,7 +14,7 @@ interface IRecentTransactions {
 
 export default function RecentTransactions({ isPending, recents, onRefresh }: IRecentTransactions) {
   return (
-    <View style={styles.recentPaymentsContainer}>
+    <>
       <View style={styles.recentTitleContainer}>
         <Text style={styles.recentsTitle}>Recents</Text>
         {isPending ? (
@@ -49,18 +42,11 @@ export default function RecentTransactions({ isPending, recents, onRefresh }: IR
         )}
         estimatedItemSize={50}
       />
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  recentPaymentsContainer: {
-    width: "100%",
-    // borderWidth: 1,
-    marginTop: Margins.large,
-    // minHeight: 100,
-    flex: 1,
-  },
   recentTitleContainer: {
     flexDirection: "row",
   },
@@ -71,7 +57,6 @@ const styles = StyleSheet.create({
     padding: Paddings.large,
   },
   refresh: {
-    // borderWidth: 1,
     alignContent: "center",
     color: Colors.light.primary,
   },

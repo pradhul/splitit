@@ -19,6 +19,12 @@ import { getFilteredDocuments, saveDocument } from "./FirestoreService";
 import { transformFromFireStoreRecord, transformToFireStoreRecord } from "@/apis/FirestoreUtils";
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
+interface ICategory {
+  category: string;
+  _created: string;
+  _modified: string;
+  iconUsed: string;
+}
 
 export const saveTransaction = async (transactionPayload: ITransactionPayload) => {
   const userId = auth.currentUser?.uid;
@@ -38,9 +44,25 @@ export const saveTransaction = async (transactionPayload: ITransactionPayload) =
   saveDocument(
     `${SAVE_DOCUMENTS}${collectionNames.transactions}`,
     transformToFireStoreRecord(transaction)
-    // token
   );
 };
+
+export const saveNewCategory = async (category: string) => {
+  const timestamp = new Date().toISOString();
+  const newCategory: ICategory = {
+    category,
+    _created: timestamp,
+    _modified: timestamp,
+    iconUsed: "default",
+  };
+
+  saveDocument(
+    `${SAVE_DOCUMENTS}${collectionNames.categories}`,
+    transformToFireStoreRecord(newCategory),
+    category
+  );
+};
+
 
 /**
  * Retrieves and processes recent transactions from Firestore.
