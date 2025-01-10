@@ -15,8 +15,12 @@ import {
 } from "@/apis/constants";
 import { auth } from "@/firebaseConfig";
 import { ITransaction } from "@/types/transactions";
-import { getFilteredDocuments, saveDocument } from "./FirestoreService";
-import { transformFromFireStoreRecord, transformToFireStoreRecord } from "@/apis/FirestoreUtils";
+import { getAllDocuments, getFilteredDocuments, saveDocument } from "./FirestoreService";
+import {
+  formatResponse,
+  transformFromFireStoreRecord,
+  transformToFireStoreRecord,
+} from "@/apis/FirestoreUtils";
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
 interface ICategory {
@@ -63,7 +67,6 @@ export const saveNewCategory = async (category: string) => {
   );
 };
 
-
 /**
  * Retrieves and processes recent transactions from Firestore.
  *
@@ -87,9 +90,21 @@ export const getRecentTransactions = async () => {
 
   return await Promise.all(
     response.data.map(async ({ document: { fields, name } }: any) => {
-      const docId = name.split("/").pop();
-      const transformed = await transformFromFireStoreRecord(fields);
-      return { ...transformed, docId };
+      return await formatResponse(name, fields);
     })
   );
+};
+
+export const getAllUsers = async () => {
+  const result = await getAllDocuments(SAVE_DOCUMENTS, collectionNames.users);
+  try {
+    return await Promise.all(
+      result.documents.map(async ({ fields, name }: any) => {
+        return await formatResponse(name, fields);
+      })
+    );
+  } catch (err) {
+    console.error("An Error Occurred when getting users", err);
+    throw err;
+  }
 };

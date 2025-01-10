@@ -176,3 +176,9 @@ function _getFirestoreType(record: Record<string, any>, key: string) {
       return "unIdentified";
   }
 }
+
+export async function formatResponse(referencePath: string, fields: any) {
+  const docId = referencePath ? referencePath.split("/").pop() : "";
+  const transformed = await transformFromFireStoreRecord(fields);
+  return { ...transformed, docId };
+}

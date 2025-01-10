@@ -10,8 +10,8 @@ import { View, StyleSheet } from "react-native";
 import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
 import { Margins, Paddings } from "@/constants/Dimensions";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getRecentTransactions, saveNewCategory, saveTransaction } from "@/apis";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { getAllUsers, getRecentTransactions, saveNewCategory, saveTransaction } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import React, { useEffect, useState } from "react";
 import { setTransactions } from "./transactionSlice";
@@ -24,11 +24,27 @@ export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
   const dispatch = useAppDispatch();
 
-  const { isFetching, isSuccess, data, refetch } = useQuery({
-    queryKey: ["recents"],
-    queryFn: getRecentTransactions,
+  const results = useQueries({
+    queries: [
+      {
+        queryKey: ["recents"],
+        queryFn: getRecentTransactions,
+      },
+      {
+        queryKey: ["allUsers"],
+        queryFn: getAllUsers,
+      },
+    ],
   });
 
+  const [recentsResult, usersResult] = results;
+  const { isFetching, isSuccess, data: recentTransactions, refetch } = recentsResult;
+  const { data: usersData, isSuccess: isGetUsersSuccess } = usersResult;
+
+  //FIXME: Modify this code to be dispatched to redux then use from there, and use values from reducer if available
+  // May be react-query configuration also required for this
+  console.log("Users", usersData);
+  //----------
   const mutation = useMutation({
     mutationFn: saveTransaction,
     onSuccess: () => console.log("Successfully added transaction"),
@@ -39,24 +55,28 @@ export default function Index() {
     onSuccess: () => console.log("Successfully added category"),
   });
 
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState({});
   const [paidTo, setPaidTo] = useState([]);
   const [paidAmount, setPaidAmount] = useState("");
 
   useEffect(() => {
-    if (isSuccess && data) {
-      dispatch(setTransactions(data));
+    if (isSuccess && recentTransactions) {
+      dispatch(setTransactions(recentTransactions));
     }
-  }, [isSuccess, data, dispatch]);
+    // if (isGetUsersSuccess && userData) {
+    //   dispatch(setUsers(userData));
+    // }
+  }, [isSuccess, recentTransactions, dispatch]);
 
   const recordPayment = () => {
     console.log("Recording payment...", paidAmount);
     console.log("Categories:", categories);
     console.log("Paid to:", paidTo);
+    return;
     if (paidAmount && categories && paidTo) {
       mutation.mutate({
         amount: parseInt(paidAmount),
-        category: categories,
+        category: Object.keys(categories),
         to: paidTo,
       });
     } else {
@@ -74,6 +94,7 @@ export default function Index() {
     <View style={styles.container}>
       <View style={styles.paymentContainer}>
         <PaymentOptions
+          usersList={usersData}
           updateCategories={setCategories}
           updatePaymentTo={setPaidTo}
           getNewCategory={storeNewCategory}

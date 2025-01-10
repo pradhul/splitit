@@ -21,6 +21,7 @@ export interface ITagProps {
   onTagPress?: Function;
   isSelected?: boolean;
   type?: "category" | "user";
+  meta?: Record<string, any>;
 }
 export default function Tag({
   text,
@@ -28,6 +29,7 @@ export default function Tag({
   onTagPress,
   isSelected,
   type = "category",
+  meta = {},
 }: ITagProps) {
   const { bounce, bounceStyle } = useBounce();
   const ellipsisLimit = 7;
@@ -47,7 +49,7 @@ export default function Tag({
   };
 
   const truncateText = () => {
-    const name = text && text.length > 7 ? `${text.slice(0, ellipsisLimit)}...` : text;
+    const name = text && text.length > 5 ? `${text.slice(0, ellipsisLimit)}..` : text;
     return <Text style={tagTextStyle}>{name}</Text>;
   };
 
@@ -63,7 +65,7 @@ export default function Tag({
         activeOpacity={1}
         onPress={() => tagSelected()}
       >
-        <Ionicons name={iconName} size={20} color={colors.neutral} />
+        <Ionicons style={styles.icon} name={iconName} size={20} color={colors.neutral} />
         {isCategoryType && truncateText()}
       </AnimatedTouchable>
       {!isCategoryType && truncateText()}
@@ -78,8 +80,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: Paddings.large,
     margin: Margins.small,
+    marginRight: Margins.large,
   },
   tagText: {
-    color: colors.neutral,
+    color: colors.accentSelected,
+  },
+  icon: {
+    padding: Paddings.normal,
   },
 });

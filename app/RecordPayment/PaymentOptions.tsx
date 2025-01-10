@@ -13,11 +13,13 @@ interface IPaymentOptions {
   updateCategories: Function;
   updatePaymentTo: Function;
   getNewCategory: (name: string) => void;
+  usersList: IUsers[];
 }
 export default function PaymentOptions({
   updateCategories,
   updatePaymentTo,
   getNewCategory,
+  usersList,
 }: IPaymentOptions) {
   return (
     <View style={styles.paymentDetails}>
@@ -37,10 +39,7 @@ export default function PaymentOptions({
         <Text>To</Text>
         <View style={styles.paymentParties}>
           <TagGroup multiselect onTagChange={updatePaymentTo}>
-            <Tag
-              type="user"
-              text="projects/groupbill-f9c8d/databases/(default)/documents/users/5XM8nNSpEtKlucYHXdLJ" //FIXME: remove this, and implement logic for sending any info from inside
-            />
+            {usersList && usersList.map((user) => <Tag type="user" text={user.name} meta={user} />)}
           </TagGroup>
         </View>
       </View>

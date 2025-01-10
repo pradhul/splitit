@@ -90,3 +90,11 @@ export const saveDocument = (url: URL, document: any, id?: string) => {
       throw new Error(error);
     });
 };
+
+export const getAllDocuments = (url: URL, collectionName: string) => {
+  return ApiClient.get(url + `${collectionName}`)
+    .then((response) => response.data)
+    .catch((error) => {
+      throw new Error(error);
+    });
+};
