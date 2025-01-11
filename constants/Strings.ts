@@ -12,9 +12,5 @@ export const Titles = {
 export const RecordPaymentPage = {
   recordPaymentButton: "Record Payment",
   rupeeSymbol: "₹",
-};
-
-export const TransactionStatus = {
-  SETTLED: "settled",
-  UNSETTLED: "unsettled",
+  errorSavingTransaction: "Error Saving Transaction, Please try again",
 };

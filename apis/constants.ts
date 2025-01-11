@@ -32,5 +32,3 @@ export const regEx = {
     "^\\d{4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(\\.\\d{1,3})?([Zz]|(\\+\\d{1,2}:\\d{1,2}))$"
   ),
 };
-
-//"projects/groupbill-f9c8d/databases/(default)/documents/users/5XM8nNSpEtKlucYHXdLJ"

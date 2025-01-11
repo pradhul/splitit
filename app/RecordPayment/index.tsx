@@ -19,6 +19,7 @@ import PaymentOptions from "@/app/RecordPayment/PaymentOptions";
 import RecentTransactions from "@/app/RecordPayment/RecentTransactions/RecentTransactions";
 import { RecordPaymentPage } from "@/constants/Strings";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { DOCUMENT_REFERENCE_BASE } from "@/apis/constants";
 
 export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
@@ -48,15 +49,25 @@ export default function Index() {
   const mutation = useMutation({
     mutationFn: saveTransaction,
     onSuccess: () => console.log("Successfully added transaction"),
+    onError: (error) => {
+      console.log("Error adding transaction");
+      alert(RecordPaymentPage.errorSavingTransaction);
+    },
   });
 
   const saveCategory = useMutation({
     mutationFn: saveNewCategory,
     onSuccess: () => console.log("Successfully added category"),
   });
-
-  const [categories, setCategories] = useState({});
-  const [paidTo, setPaidTo] = useState([]);
+  type SelectedTags = {
+    selectedTags: any;
+  };
+  const [categories, setCategories] = useState<SelectedTags>({
+    selectedTags: {},
+  });
+  const [paidTo, setPaidTo] = useState<SelectedTags>({
+    selectedTags: {},
+  });
   const [paidAmount, setPaidAmount] = useState("");
 
   useEffect(() => {
@@ -64,20 +75,22 @@ export default function Index() {
       dispatch(setTransactions(recentTransactions));
     }
     // if (isGetUsersSuccess && userData) {
-    //   dispatch(setUsers(userData));
+    //   dispatch(setUsers(userData));`
     // }
   }, [isSuccess, recentTransactions, dispatch]);
 
   const recordPayment = () => {
     console.log("Recording payment...", paidAmount);
-    console.log("Categories:", categories);
+    console.log("Categories:", categories.selectedTags);
     console.log("Paid to:", paidTo);
-    return;
     if (paidAmount && categories && paidTo) {
       mutation.mutate({
         amount: parseInt(paidAmount),
-        category: Object.keys(categories),
-        to: paidTo,
+        category: Object.keys(categories.selectedTags),
+        to: Object.keys(paidTo.selectedTags).reduce((acc: string[], tag: string) => {
+          acc.push(DOCUMENT_REFERENCE_BASE + "users/" + paidTo.selectedTags[tag].docId); //FIXME: clean this up , and the firestore is written with string data not reference
+          return acc;
+        }, []),
       });
     } else {
       alert("Please fill all the fields");
