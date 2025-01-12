@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL, DEFAULT_REQUEST_TIMEOUT, DEFAULT_TIMEOUT_ERROR } from "@/apis/constants";
+import { BASE_URL, DEFAULT_REQUEST_TIMEOUT, DEFAULT_TIMEOUT_ERROR } from "@/services/constants";
 import { auth } from "@/firebaseConfig";
 
 let cachedToken: string | null = null;

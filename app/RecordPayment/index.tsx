@@ -11,16 +11,16 @@ import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
 import { Margins, Paddings } from "@/constants/Dimensions";
 import { useMutation, useQueries } from "@tanstack/react-query";
-import { getAllUsers, getRecentTransactions, saveNewCategory, saveTransaction } from "@/apis";
+import { getAllUsers, getRecentTransactions, saveNewCategory, saveTransaction } from "@/services";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import React, { useEffect, useState } from "react";
 import { setTransactions } from "@/app/slices/transactionSlice";
 import PaymentOptions from "@/app/RecordPayment/PaymentOptions";
 import RecentTransactions from "@/app/RecordPayment/RecentTransactions/RecentTransactions";
 import { RecordPaymentPage } from "@/constants/Strings";
-import { DOCUMENT_REFERENCE_BASE } from "@/apis/constants";
+import { DOCUMENT_REFERENCE_BASE } from "@/services/constants";
 import { setUsers } from "../slices/usersSlice";
-import { referenceFromDocIds } from "@/apis/FirestoreUtils";
+import { referenceFromDocIds } from "@/services/FirestoreUtils";
 
 export default function Index() {
   const recents = useAppSelector((store) => store.transactions);

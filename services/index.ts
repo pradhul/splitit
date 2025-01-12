@@ -12,7 +12,7 @@ import {
   DOCUMENT_REFERENCE_BASE,
   GET_ALL_DOCUMENTS,
   SAVE_DOCUMENTS,
-} from "@/apis/constants";
+} from "@/services/constants";
 import { auth } from "@/firebaseConfig";
 import { ITransaction } from "@/types/transactions";
 import { getAllDocuments, getFilteredDocuments, saveDocument } from "./FirestoreService";
@@ -20,7 +20,7 @@ import {
   formatResponse,
   transformFromFireStoreRecord,
   transformToFireStoreRecord,
-} from "@/apis/FirestoreUtils";
+} from "@/services/FirestoreUtils";
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
 interface ICategory {
