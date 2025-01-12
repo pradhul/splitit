@@ -10,19 +10,21 @@ import { View, StyleSheet } from "react-native";
 import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
 import { Margins, Paddings } from "@/constants/Dimensions";
-import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries } from "@tanstack/react-query";
 import { getAllUsers, getRecentTransactions, saveNewCategory, saveTransaction } from "@/apis";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import React, { useEffect, useState } from "react";
-import { setTransactions } from "./transactionSlice";
+import { setTransactions } from "@/app/slices/transactionSlice";
 import PaymentOptions from "@/app/RecordPayment/PaymentOptions";
 import RecentTransactions from "@/app/RecordPayment/RecentTransactions/RecentTransactions";
 import { RecordPaymentPage } from "@/constants/Strings";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { DOCUMENT_REFERENCE_BASE } from "@/apis/constants";
+import { setUsers } from "../slices/usersSlice";
+import { referenceFromDocIds } from "@/apis/FirestoreUtils";
 
 export default function Index() {
   const recents = useAppSelector((store) => store.transactions);
+  const users = useAppSelector((store) => store.users);
   const dispatch = useAppDispatch();
 
   const results = useQueries({
@@ -42,10 +44,6 @@ export default function Index() {
   const { isFetching, isSuccess, data: recentTransactions, refetch } = recentsResult;
   const { data: usersData, isSuccess: isGetUsersSuccess } = usersResult;
 
-  //FIXME: Modify this code to be dispatched to redux then use from there, and use values from reducer if available
-  // May be react-query configuration also required for this
-  console.log("Users", usersData);
-  //----------
   const mutation = useMutation({
     mutationFn: saveTransaction,
     onSuccess: () => console.log("Successfully added transaction"),
@@ -74,23 +72,18 @@ export default function Index() {
     if (isSuccess && recentTransactions) {
       dispatch(setTransactions(recentTransactions));
     }
-    // if (isGetUsersSuccess && userData) {
-    //   dispatch(setUsers(userData));`
-    // }
-  }, [isSuccess, recentTransactions, dispatch]);
+    if (isGetUsersSuccess && usersData) {
+      dispatch(setUsers(usersData));
+    }
+  }, [isSuccess, recentTransactions, usersData, dispatch]);
 
   const recordPayment = () => {
     console.log("Recording payment...", paidAmount);
-    console.log("Categories:", categories.selectedTags);
-    console.log("Paid to:", paidTo);
     if (paidAmount && categories && paidTo) {
       mutation.mutate({
         amount: parseInt(paidAmount),
         category: Object.keys(categories.selectedTags),
-        to: Object.keys(paidTo.selectedTags).reduce((acc: string[], tag: string) => {
-          acc.push(DOCUMENT_REFERENCE_BASE + "users/" + paidTo.selectedTags[tag].docId); //FIXME: clean this up , and the firestore is written with string data not reference
-          return acc;
-        }, []),
+        to: referenceFromDocIds(paidTo.selectedTags as referenceFromDocIds.ObjectsWithDocIds),
       });
     } else {
       alert("Please fill all the fields");
@@ -107,7 +100,7 @@ export default function Index() {
     <View style={styles.container}>
       <View style={styles.paymentContainer}>
         <PaymentOptions
-          usersList={usersData}
+          usersList={users}
           updateCategories={setCategories}
           updatePaymentTo={setPaidTo}
           getNewCategory={storeNewCategory}

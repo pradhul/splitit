@@ -6,7 +6,7 @@
  * @desc [description]
  */
 
-import { GET_DOCUMENTS_BATCH, regEx } from "./constants";
+import { DOCUMENT_REFERENCE_BASE, GET_DOCUMENTS_BATCH, regEx } from "./constants";
 import { getDocumentsBatch } from "./FirestoreService";
 
 type FireStoreStringField = "stringValue" | "referenceValue" | "timestampValue" | "arrayValue";
@@ -181,4 +181,29 @@ export async function formatResponse(referencePath: string, fields: any) {
   const docId = referencePath ? referencePath.split("/").pop() : "";
   const transformed = await transformFromFireStoreRecord(fields);
   return { ...transformed, docId };
+}
+
+export function referenceFromDocIds(singleDocIdString: referenceFromDocIds.SingleDocId): string;
+export function referenceFromDocIds(
+  singleDocIdObject: referenceFromDocIds.SingleDocIdObject
+): string;
+export function referenceFromDocIds(
+  objectsWithDocIds: referenceFromDocIds.ObjectsWithDocIds
+): string[];
+export function referenceFromDocIds(
+  elementDocId:
+    | referenceFromDocIds.ObjectsWithDocIds
+    | referenceFromDocIds.SingleDocIdObject
+    | referenceFromDocIds.SingleDocId
+) {
+  if (typeof elementDocId === "string") {
+    return DOCUMENT_REFERENCE_BASE + "users/" + elementDocId;
+  }
+  if ("docId" in elementDocId) {
+    return DOCUMENT_REFERENCE_BASE + "users/" + elementDocId.docId;
+  }
+  return Object.keys(elementDocId).reduce((acc: string[], tag: string) => {
+    acc.push(DOCUMENT_REFERENCE_BASE + "users/" + elementDocId[tag].docId);
+    return acc;
+  }, []);
 }

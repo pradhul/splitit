@@ -6,11 +6,13 @@
  * @desc [description]
  */
 import { configureStore } from "@reduxjs/toolkit";
-import transactionReducer from "@/app/RecordPayment/transactionSlice";
+import transactionReducer from "@/app/slices/transactionSlice";
+import userReducer from "@/app/slices/usersSlice";
 
 export const store = configureStore({
   reducer: {
     transactions: transactionReducer,
+    users: userReducer,
   },
 });
 

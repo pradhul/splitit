@@ -1,7 +1,7 @@
-type IUsers = {
+type IUser = {
   name: string;
 };
 
-type IUsersWithDocId = IUsers & {
+type IUserWithDocId = IUser & {
   docId: string;
 };
