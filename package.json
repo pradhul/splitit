@@ -8,7 +8,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "list-emulators": "emulator -list-avds",
+    "start-emulator": "emulator -avd Medium_Phone_API_35"
   },
   "jest": {
     "preset": "jest-expo",
@@ -44,7 +46,8 @@
     "react-native-svg": "^15.8.0",
     "react-native-web": "~0.19.10",
     "react-redux": "^9.1.2",
-    "react-test-renderer": "^18.3.1"
+    "react-test-renderer": "^18.3.1",
+    "expo-dev-client": "~5.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
