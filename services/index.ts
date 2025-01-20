@@ -23,12 +23,6 @@ import {
 } from "@/services/FirestoreUtils";
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
-interface ICategory {
-  category: string;
-  _created: string;
-  _modified: string;
-  iconUsed: string;
-}
 
 export const saveTransaction = async (transactionPayload: ITransactionPayload) => {
   const userId = auth.currentUser?.uid;

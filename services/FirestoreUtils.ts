@@ -24,6 +24,9 @@ type FireStoreRecord =
  **/
 export async function transformFromFireStoreRecord(record: FireStoreRecord) {
   const keys = Object.keys(record);
+  if (keys.length === 0) {
+    console.warn("No keys found for ", record, " returning..");
+  }
   try {
     const result = await keys.reduce(async (accPromise: Promise<Record<string, any>>, key) => {
       const acc = await Promise.resolve(accPromise);
@@ -36,17 +39,15 @@ export async function transformFromFireStoreRecord(record: FireStoreRecord) {
           acc[key.trim()] = parseInt(fireStoreFieldObject[fireStoreFieldName]);
         } else if (fireStoreFieldName === "referenceValue") {
           //FIXME: this call references back to firestoreService file, fix it later
-          const result = await getDocumentsBatch(GET_DOCUMENTS_BATCH, [
-            fireStoreFieldObject[fireStoreFieldName],
-          ]);
+          const result = await getDocumentsBatch(GET_DOCUMENTS_BATCH, [fireStoreFieldObject[fireStoreFieldName]]);
           const readableName = result?.name?.stringValue || "";
           acc[key.trim()] = readableName;
         } else if (fireStoreFieldName === "arrayValue") {
-          acc[key.trim()] = await Promise.all(
-            (fireStoreFieldObject[fireStoreFieldName].values as any[]).map((value) =>
-              transformFromFireStoreRecord({ [key.trim()]: value })
-            )
-          );
+          if (!fireStoreFieldObject[fireStoreFieldName].values) {
+            console.warn(`for ${fireStoreFieldName} values are undefined skipping value extractions..`);
+            return acc;
+          }
+          acc[key.trim()] = await Promise.all((fireStoreFieldObject[fireStoreFieldName].values as any[]).map((value) => transformFromFireStoreRecord({ [key.trim()]: value })));
         } else {
           acc[key.trim()] = fireStoreFieldObject[fireStoreFieldName];
         }
@@ -57,7 +58,8 @@ export async function transformFromFireStoreRecord(record: FireStoreRecord) {
     }, Promise.resolve({}));
     return _flattenArrays(result);
   } catch (err) {
-    console.error("Error Occurred Transforming Record From Firestore", err);
+    console.error("Error Occurred Transforming Record From Firestore ->", err);
+    throw err;
   }
 }
 
@@ -90,9 +92,7 @@ export function transformToFireStoreRecord(record: any, isTopLevelCall = true): 
       case "arrayValue": {
         firestoreRecord[key] = {
           arrayValue: {
-            values: record[key].map(
-              (item: any) => transformToFireStoreRecord({ item }, false)["item"]
-            ),
+            values: record[key].map((item: any) => transformToFireStoreRecord({ item }, false)["item"]),
           },
         };
         break;
@@ -129,13 +129,7 @@ function _flattenArrays(result: Record<string, any>): any {
  *          "timestampValue", "integerValue", or "arrayValue". Otherwise, returns false.
  */
 function _isFireStoreField(fieldName: string): fieldName is FireStoreField {
-  return (
-    fieldName === "stringValue" ||
-    fieldName === "referenceValue" ||
-    fieldName === "timestampValue" ||
-    fieldName === "integerValue" ||
-    fieldName === "arrayValue"
-  );
+  return fieldName === "stringValue" || fieldName === "referenceValue" || fieldName === "timestampValue" || fieldName === "integerValue" || fieldName === "arrayValue";
 }
 
 /**
@@ -178,24 +172,16 @@ function _getFirestoreType(record: Record<string, any>, key: string) {
 }
 
 export async function formatResponse(referencePath: string, fields: any) {
+  console.debug("formatting Response");
   const docId = referencePath ? referencePath.split("/").pop() : "";
   const transformed = await transformFromFireStoreRecord(fields);
   return { ...transformed, docId };
 }
 
 export function referenceFromDocIds(singleDocIdString: referenceFromDocIds.SingleDocId): string;
-export function referenceFromDocIds(
-  singleDocIdObject: referenceFromDocIds.SingleDocIdObject
-): string;
-export function referenceFromDocIds(
-  objectsWithDocIds: referenceFromDocIds.ObjectsWithDocIds
-): string[];
-export function referenceFromDocIds(
-  elementDocId:
-    | referenceFromDocIds.ObjectsWithDocIds
-    | referenceFromDocIds.SingleDocIdObject
-    | referenceFromDocIds.SingleDocId
-) {
+export function referenceFromDocIds(singleDocIdObject: referenceFromDocIds.SingleDocIdObject): string;
+export function referenceFromDocIds(objectsWithDocIds: referenceFromDocIds.ObjectsWithDocIds): string[];
+export function referenceFromDocIds(elementDocId: referenceFromDocIds.ObjectsWithDocIds | referenceFromDocIds.SingleDocIdObject | referenceFromDocIds.SingleDocId) {
   if (typeof elementDocId === "string") {
     return DOCUMENT_REFERENCE_BASE + "users/" + elementDocId;
   }
