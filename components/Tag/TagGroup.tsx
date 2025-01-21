@@ -5,16 +5,11 @@
  * @modify date 2024-12-01 03:55:47
  * @desc [description]
  */
-import React, {
-  Children,
-  cloneElement,
-  isValidElement,
-  useEffect,
-  useState,
-} from "react";
+import React, { Children, cloneElement, isValidElement, useEffect, useState } from "react";
 import { View } from "react-native";
 import Tag, { ITagProps } from "./Tag";
 import GeneratedTag from "./GeneratedTag";
+import { FlashList } from "@shopify/flash-list";
 
 interface ITagGroupProps {
   multiselect?: boolean;
@@ -22,11 +17,12 @@ interface ITagGroupProps {
   children: React.ReactElement<ITagProps> | React.ReactElement<ITagProps>[];
 }
 
-export default function TagGroup({
-  multiselect = false,
-  onTagChange,
-  children,
-}: ITagGroupProps) {
+interface IFlashListProps {
+  renderItem: ({ item }: any) => React.ReactElement<ITagProps>;
+  data: any[];
+}
+
+export default function TagGroup({ multiselect = false, onTagChange, children }: ITagGroupProps) {
   const [selectedTags, setSelectedTags] = useState<{ [key: string]: Record<string, any> }>({});
 
   useEffect(() => {
@@ -59,6 +55,11 @@ export default function TagGroup({
     }
   }
 
+  function isOfTypeFlashList(
+    child: React.ReactElement<ITagProps> | React.ReactElement<IFlashListProps>,
+  ): child is React.ReactElement<IFlashListProps> {
+    return child.type === FlashList && "renderItem" in child.props;
+  }
   return (
     <View style={{ flexDirection: "row" }}>
       {Children.map(children, (child: React.ReactElement<ITagProps>) => {
@@ -67,6 +68,21 @@ export default function TagGroup({
           return cloneElement(child, {
             onTagPress: () => handleTagPress(child.props.text, child.props.meta || {}),
             isSelected,
+          });
+        } else if (isValidElement(child) && isOfTypeFlashList(child)) {
+          return cloneElement(child, {
+            ...child.props,
+            extraData: selectedTags,
+            renderItem: (info: { item: any }) => {
+              const tagelement = child.props.renderItem(info);
+              console.log("Original Tag", tagelement);
+              return cloneElement(tagelement, {
+                ...info,
+                ...tagelement.props,
+                onTagPress: () => handleTagPress(tagelement.props.text, tagelement.props.meta || {}),
+                isSelected: !!selectedTags[tagelement.props.text],
+              });
+            },
           });
         } else {
           console.warn("Non <Tag/> Element Passed inside <TagGroup />", child.type);

@@ -22,15 +22,10 @@ export interface ITagProps {
   isSelected?: boolean;
   type?: "category" | "user";
   meta?: Record<string, any>;
+  renderItem?: (item: any) => React.ReactElement<ITagProps>;
+  extraData?: any;
 }
-export default function Tag({
-  text,
-  onTagSelected,
-  onTagPress,
-  isSelected,
-  type = "category",
-  meta = {},
-}: ITagProps) {
+export default function Tag({ text, onTagSelected, onTagPress, isSelected, type = "category", meta = {} }: ITagProps) {
   const { bounce, bounceStyle } = useBounce();
   const ellipsisLimit = 7;
 
@@ -60,11 +55,7 @@ export default function Tag({
 
   return (
     <View style={{ flexDirection: "column", alignItems: "center" }}>
-      <AnimatedTouchable
-        style={[tagStyle, bounceStyle]}
-        activeOpacity={1}
-        onPress={() => tagSelected()}
-      >
+      <AnimatedTouchable style={[tagStyle, bounceStyle]} activeOpacity={1} onPress={() => tagSelected()}>
         <Ionicons style={styles.icon} name={iconName} size={20} color={colors.neutral} />
         {isCategoryType && truncateText()}
       </AnimatedTouchable>

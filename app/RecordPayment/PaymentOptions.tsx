@@ -7,20 +7,16 @@
  */
 import { Tag, TagGroup, GeneratedTag } from "@/components/Tag";
 import { Paddings } from "@/constants/Dimensions";
+import { FlashList } from "@shopify/flash-list";
 import { View, Text, StyleSheet } from "react-native";
 
 interface IPaymentOptions {
   updateCategories: Function;
   updatePaymentTo: Function;
   getNewCategory: (name: string) => void;
-  usersList: IUsers[];
+  usersList: IUserWithDocId[];
 }
-export default function PaymentOptions({
-  updateCategories,
-  updatePaymentTo,
-  getNewCategory,
-  usersList,
-}: IPaymentOptions) {
+export default function PaymentOptions({ updateCategories, updatePaymentTo, getNewCategory, usersList }: IPaymentOptions) {
   return (
     <View style={styles.paymentDetails}>
       {/* Category section*/}
@@ -39,7 +35,15 @@ export default function PaymentOptions({
         <Text>To</Text>
         <View style={styles.paymentParties}>
           <TagGroup multiselect onTagChange={updatePaymentTo}>
-            {usersList && usersList.map((user) => <Tag type="user" text={user.name} meta={user} />)}
+            <FlashList
+              horizontal
+              data={usersList}
+              showsHorizontalScrollIndicator={false}
+              scrollEventThrottle={16}
+              nestedScrollEnabled={true}
+              renderItem={({ item }) => <Tag type="user" text={item.name} meta={item} />}
+              keyExtractor={(item) => item.docId}
+            />
           </TagGroup>
         </View>
       </View>
@@ -69,5 +73,6 @@ const styles = StyleSheet.create({
   },
   paymentParties: {
     flexDirection: "row",
+    height: 100,
   },
 });
