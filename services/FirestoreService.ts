@@ -85,9 +85,13 @@ export const getDocumentsBatch = (url: URL, documents: string[]) =>
 export const saveDocument = (url: URL, document: any, id?: string) => {
   let promise = id ? ApiClient.patch(url + `/${id}`, document) : ApiClient.post(url, document);
   return promise
-    .then((response) => console.log("Successfully Saved Document"))
+    .then((response) => {
+      console.log("Successfully Saved Document");
+      return response;
+    })
     .catch((error) => {
-      throw new Error(error);
+      console.error("Error saving document", error);
+      return Promise.reject(error);
     });
 };
 

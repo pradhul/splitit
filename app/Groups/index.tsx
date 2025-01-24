@@ -1,3 +1,10 @@
+/**
+ * @author Pradhul
+ * @email pradhudev.1990@gmail.com
+ * @create date 2025-01-24 22:08:00
+ * @modify date 2025-01-24 22:08:00
+ * @desc [description]
+ */
 import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
 import { Colors } from "@/constants/Colors";
@@ -5,9 +12,17 @@ import { Margins, Paddings } from "@/constants/Dimensions";
 import { View, Text, StyleSheet } from "react-native";
 import Card from "@/components/Card";
 import { FlashList } from "@shopify/flash-list";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { saveNewGroup } from "@/services";
 
 const NewGroup = () => {
-  const groupList = [
+  const [groupName, setGroupName] = useState("");
+  const [description, setDescription] = useState("");
+  const [users, setUsers] = useState("");
+  const [emails, setEmails] = useState("");
+
+  const groupList: Group[] = [
     {
       name: "Weekend Getaway",
       noOfPeople: 4,
@@ -28,7 +43,24 @@ const NewGroup = () => {
     },
   ];
 
-  const getGroupCard = ({ item }) => (
+  const _saveNewGroup = useMutation({
+    mutationFn: saveNewGroup,
+    onSuccess: () => console.log("Successfully added group"),
+    onError: () => console.log("Error adding group"),
+  });
+
+  const createNewGroup = () => {
+    const newGroup: Group = {
+      name: groupName,
+      noOfPeople: 4,
+      description,
+      status: "New",
+    };
+    _saveNewGroup.mutate(newGroup);
+  };
+
+  /** An individual group card for the existing groups list */
+  const getGroupCard = ({ item }: { item: Group }) => (
     <Card>
       <Text style={[styles.cardText, styles.primaryText]}>{item.name}</Text>
       <Text style={[styles.cardText]}>
@@ -47,12 +79,17 @@ const NewGroup = () => {
         <Text style={styles.titleText}>New Group</Text>
 
         <Card>
-          <Text style={[styles.cardText, styles.primaryText]}>Select Users</Text>
-          <PrimaryInput placeholder="Select users by name" inputValue={""} onValueChange={() => {}} />
-          <PrimaryInput placeholder="Invite by email" inputValue={""} onValueChange={() => {}} />
+          <PrimaryInput
+            placeholder="Group Name (This cannot be changed after)"
+            inputValue={groupName}
+            onValueChange={setGroupName}
+          />
+          <PrimaryInput placeholder="Description" inputValue={description} onValueChange={setDescription} />
+          <PrimaryInput placeholder="Select Users By Name" inputValue={users} onValueChange={setUsers} />
+          <PrimaryInput placeholder="Invite Users By Email" inputValue={emails} onValueChange={setEmails} />
         </Card>
 
-        <PrimaryButton title="Create Group" onPress={() => {}} />
+        <PrimaryButton title="Create Group" onPress={createNewGroup} />
       </View>
       <View style={styles.subSection}>
         <Text style={styles.titleText}>Existing Groups</Text>

@@ -22,6 +22,7 @@ export const collectionNames = {
   users: "users",
   transactions: "transactions",
   categories: "categories",
+  groups: "groups",
 };
 
 export const regEx = {

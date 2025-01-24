@@ -102,3 +102,27 @@ export const getAllUsers = async () => {
     throw err;
   }
 };
+
+export const saveNewGroup = async (newGroup: Group) => {
+  const timestamp = new Date().toISOString();
+  const userId = auth.currentUser?.uid;
+  if (!userId) {
+    console.error("No user is logged in!");
+    throw new Error();
+  }
+  const group: Group = {
+    ...newGroup,
+    _created: timestamp,
+    _modified: timestamp,
+  };
+  try {
+    await saveDocument(
+      `${SAVE_DOCUMENTS}${collectionNames.users}/${userId}/${collectionNames.groups}`,
+      transformToFireStoreRecord(group),
+      group.name.split(" ").join("")
+    );
+  } catch (error) {
+    console.error("Error saving new group", error);
+    throw error;
+  }
+};

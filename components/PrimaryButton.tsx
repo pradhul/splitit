@@ -2,7 +2,7 @@
  * @author Pradhul
  * @email pradhudev.1990@gmail.com
  * @create date 2024-12-01 03:56:03
- * @modify date 2024-12-01 03:56:03
+ * @modify date 2025-01-24 22:07:42
  * @desc [description]
  */
 import { Colors } from "@/constants/Colors";
@@ -11,17 +11,13 @@ import { Pressable, StyleSheet, Text } from "react-native";
 
 const colors = Colors.light;
 
-export default function PrimaryButton({
-  title,
-  onPress,
-}: {
-  title: string;
-  onPress: Function;
-}) {
+export default function PrimaryButton({ title, onPress, disabled = false }: { title: string; onPress: Function; disabled?: boolean }) {
+  const bgColor = { backgroundColor: disabled ? colors.disabled : colors.primary };
   return (
     <Pressable
       testID="primary-button"
-      style={styles.buttonPayment}
+      style={[styles.buttonPayment, bgColor]}
+      disabled={disabled}
       onPress={() => onPress()}
     >
       <Text style={styles.TextPayment}>{title}</Text>
