@@ -2,11 +2,45 @@ import PrimaryButton from "@/components/PrimaryButton";
 import PrimaryInput from "@/components/PrimaryInput";
 import { Colors } from "@/constants/Colors";
 import { Margins, Paddings } from "@/constants/Dimensions";
-import { SetStateAction } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Card from "@/components/Card";
+import { FlashList } from "@shopify/flash-list";
 
 const NewGroup = () => {
+  const groupList = [
+    {
+      name: "Weekend Getaway",
+      noOfPeople: 4,
+      description: "A trip to the Mountains",
+      status: "Settled",
+    },
+    {
+      name: "Beach Trip",
+      noOfPeople: 4,
+      description: "A trip to the Beaches",
+      status: "Not Settled",
+    },
+    {
+      name: "A Long Road Trip",
+      noOfPeople: 4,
+      description: "A Long road trip",
+      status: "Settled",
+    },
+  ];
+
+  const getGroupCard = ({ item }) => (
+    <Card>
+      <Text style={[styles.cardText, styles.primaryText]}>{item.name}</Text>
+      <Text style={[styles.cardText]}>
+        {item.noOfPeople} People | {item.description}
+      </Text>
+      <View style={[styles.cardText, styles.status]}>
+        <Text>Status :</Text>
+        <Text>{item.status}</Text>
+      </View>
+    </Card>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.subSection}>
@@ -22,33 +56,11 @@ const NewGroup = () => {
       </View>
       <View style={styles.subSection}>
         <Text style={styles.titleText}>Existing Groups</Text>
-
-        <Card>
-          <Text style={[styles.cardText, styles.primaryText]}>Weekend Getaway</Text>
-          <Text style={[styles.cardText]}>4 People | A trip to the Mountains</Text>
-          <View style={[styles.cardText, styles.status]}>
-            <Text>Status :</Text>
-            <Text>Settled</Text>
-          </View>
-        </Card>
-
-        <Card>
-          <Text style={[styles.cardText, styles.primaryText]}>Weekend Getaway</Text>
-          <Text style={[styles.cardText]}>4 People | A trip to the Mountains</Text>
-          <View style={[styles.cardText, styles.status]}>
-            <Text>Status :</Text>
-            <Text>Settled</Text>
-          </View>
-        </Card>
-
-        <Card>
-          <Text style={[styles.cardText, styles.primaryText]}>Weekend Getaway</Text>
-          <Text style={[styles.cardText]}>4 People | A trip to the Mountains</Text>
-          <View style={[styles.cardText, styles.status]}>
-            <Text>Status :</Text>
-            <Text>Settled</Text>
-          </View>
-        </Card>
+        <FlashList
+          data={groupList}
+          renderItem={getGroupCard}
+          keyExtractor={(item) => `${item.name}${item.noOfPeople}`}
+        />
       </View>
     </View>
   );
