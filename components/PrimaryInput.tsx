@@ -33,28 +33,35 @@ function PrimaryInput({
   onFocused,
 }: React.PropsWithChildren<IPrimaryInput>) {
   const _size = { fontSize: size === "normal" ? 14 : 50 };
+  const _textAlignment = { textAlign: keyboardType === "number-pad" ? "center" : "left" };
 
   return (
     <TextInput
       autoFocus={autofocus}
       keyboardType={keyboardType}
       placeholder={placeholder}
+      placeholderTextColor={colors.disabled}
       value={inputValue || ""}
-      style={[style, styles.inputPayment, _size]}
+      style={[style, styles.inputPayment, _size, _textAlignment]}
       onChangeText={(value) => onValueChange(value)}
       onFocus={onFocused}
+      underlineColorAndroid="transparent"
     />
   );
 }
 
 const styles = StyleSheet.create({
   inputPayment: {
+    backgroundColor: Colors.light.white,
     color: colors.primary,
     padding: Paddings.normal,
-    textAlign: "center",
     marginBottom: Margins.large,
-    borderBottomWidth: 0.5,
-    borderBottomColor: colors.primary,
+    borderRadius: 20,
+    // Not an actual error, removed the yellow focus box
+    outlineStyle: "none",
+    outline: "none",
+    WebkitAppearance: "none",
+    boxShadow: "none",
   },
 });
 

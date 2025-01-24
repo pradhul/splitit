@@ -34,7 +34,7 @@ export default function Registration() {
       }
       // Sign in with the credential from the response
       signInWithCredential(auth, credentials)
-        .then(() => router.replace("/RecordPayment"))
+        .then(() => router.replace("/Groups"))
         .catch((error) => console.log(error.message));
     }
   }, [response]);

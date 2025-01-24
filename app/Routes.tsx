@@ -3,6 +3,9 @@ import { router, Slot, Stack } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebaseConfig";
 import { Titles } from "@/constants/Strings";
+import { StyleSheet } from "react-native";
+import { Colors } from "@/constants/Colors";
+import { Paddings } from "@/constants/Dimensions";
 
 //FIXME: even though the loading screen is implemented here it wont work properly
 // there needs to be an additional _layout screen to protect the authenticated screens from rendering

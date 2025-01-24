@@ -128,7 +128,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: colors.backGround,
-    padding: Paddings.normal,
+    padding: Paddings.large,
+    borderWidth: 1,
   },
   paymentContainer: {
     width: "100%",
