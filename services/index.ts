@@ -24,12 +24,17 @@ import {
 
 interface ITransactionPayload extends Omit<ITransaction, "_modified" | "_created" | "from"> {}
 
-export const saveTransaction = async (transactionPayload: ITransactionPayload) => {
+const _getCurrentUser = () => {
   const userId = auth.currentUser?.uid;
   if (!userId) {
     console.error("No user is logged in!");
     throw new Error();
   }
+  return userId;
+}
+
+export const saveTransaction = async (transactionPayload: ITransactionPayload) => {
+  const userId = _getCurrentUser();
   const from = userId ? `${DOCUMENT_REFERENCE_BASE}${collectionNames.users}/${userId}` : "";
   const timestamp = new Date().toISOString();
   const transaction: ITransaction = {
@@ -102,14 +107,23 @@ export const getAllUsers = async () => {
     throw err;
   }
 };
-
+/**
+ * Saves a new group to Firestore for the currently authenticated user.
+ *
+ * This function creates a new group document in the user's groups collection,
+ * adding creation and modification timestamps. The group name is used as the
+ * document ID after removing spaces.
+ *
+ * @async
+ * @param {Group} newGroup - The group object to be saved. Should contain at least a 'name' property.
+ * @throws {Error} If no user is currently logged in.
+ * @throws {Error} If there's an issue saving the group to Firestore.
+ * @returns {Promise<void>} A promise that resolves when the group is successfully saved.
+ *
+ */
 export const saveNewGroup = async (newGroup: Group) => {
   const timestamp = new Date().toISOString();
-  const userId = auth.currentUser?.uid;
-  if (!userId) {
-    console.error("No user is logged in!");
-    throw new Error();
-  }
+  const userId = _getCurrentUser();
   const group: Group = {
     ...newGroup,
     _created: timestamp,
@@ -124,5 +138,20 @@ export const saveNewGroup = async (newGroup: Group) => {
   } catch (error) {
     console.error("Error saving new group", error);
     throw error;
+  }
+};
+
+export const getAllGroups = async () => {
+  try {
+    const currenUser = _getCurrentUser();
+    const result = await getAllDocuments(`${SAVE_DOCUMENTS}${collectionNames.users}/${currenUser}/`, collectionNames.groups);
+    return await Promise.all(
+      result.documents.map(async ({ fields, name }: any) => {
+        return await formatResponse(name, fields);
+      })
+    );
+  } catch(err) {
+    console.error("An Error Occured", err);
+    throw err;
   }
 };

@@ -43,10 +43,11 @@ const NewGroup = () => {
     },
   ];
 
-  const _saveNewGroup = useMutation({
+  const { status, ..._saveNewGroup } = useMutation({
     mutationFn: saveNewGroup,
     onSuccess: () => console.log("Successfully added group"),
-    onError: () => console.log("Error adding group"),
+    onError: (err) => console.log("Error adding group", err),
+    onSettled: () => console.log("Settled adding group"),
   });
 
   const createNewGroup = () => {
@@ -80,7 +81,7 @@ const NewGroup = () => {
 
         <Card>
           <PrimaryInput
-            placeholder="Group Name (This cannot be changed after)"
+            placeholder="Group Name"
             inputValue={groupName}
             onValueChange={setGroupName}
           />
@@ -89,7 +90,7 @@ const NewGroup = () => {
           <PrimaryInput placeholder="Invite Users By Email" inputValue={emails} onValueChange={setEmails} />
         </Card>
 
-        <PrimaryButton title="Create Group" onPress={createNewGroup} />
+        <PrimaryButton title="Create Group" status={status as Status} onPress={createNewGroup} />
       </View>
       <View style={styles.subSection}>
         <Text style={styles.titleText}>Existing Groups</Text>

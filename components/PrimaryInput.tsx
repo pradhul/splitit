@@ -8,7 +8,7 @@
 import { Colors } from "@/constants/Colors";
 import { Paddings, Margins, FontSize } from "@/constants/Dimensions";
 import React, { Dispatch, SetStateAction } from "react";
-import { StyleSheet, TextInput } from "react-native";
+import { StyleSheet, TextInput, Platform } from "react-native";
 
 const colors = Colors.light;
 interface IPrimaryInput {
@@ -57,11 +57,13 @@ const styles = StyleSheet.create({
     padding: Paddings.normal,
     marginBottom: Margins.large,
     borderRadius: 20,
-    // Not an actual error, removed the yellow focus box
-    outlineStyle: "none",
-    outline: "none",
-    WebkitAppearance: "none",
-    boxShadow: "none",
+    // Remove focus outline styles for web
+    ...(Platform.OS === 'web' ? {
+      outlineWidth: 0,
+      outlineColor: 'transparent',
+      WebkitAppearance: 'none',
+      boxShadow: 'none',
+    } : {}),
   },
 });
 
