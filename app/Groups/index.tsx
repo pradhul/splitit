@@ -13,8 +13,8 @@ import { View, Text, StyleSheet } from "react-native";
 import Card from "@/components/Card";
 import { FlashList } from "@shopify/flash-list";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { saveNewGroup } from "@/services";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getAllGroups, saveNewGroup } from "@/services";
 
 const NewGroup = () => {
   const [groupName, setGroupName] = useState("");
@@ -22,26 +22,11 @@ const NewGroup = () => {
   const [users, setUsers] = useState("");
   const [emails, setEmails] = useState("");
 
-  const groupList: Group[] = [
-    {
-      name: "Weekend Getaway",
-      noOfPeople: 4,
-      description: "A trip to the Mountains",
-      status: "Settled",
-    },
-    {
-      name: "Beach Trip",
-      noOfPeople: 4,
-      description: "A trip to the Beaches",
-      status: "Not Settled",
-    },
-    {
-      name: "A Long Road Trip",
-      noOfPeople: 4,
-      description: "A Long road trip",
-      status: "Settled",
-    },
-  ];
+  const { isRefetching, refetch, data: groups, error } = useQuery({
+    queryKey: ['groups'],
+    queryFn: getAllGroups,
+  });
+
 
   const { status, ..._saveNewGroup } = useMutation({
     mutationFn: saveNewGroup,
@@ -92,14 +77,17 @@ const NewGroup = () => {
 
         <PrimaryButton title="Create Group" status={status as Status} onPress={createNewGroup} />
       </View>
-      <View style={styles.subSection}>
-        <Text style={styles.titleText}>Existing Groups</Text>
-        <FlashList
-          data={groupList}
-          renderItem={getGroupCard}
-          keyExtractor={(item) => `${item.name}${item.noOfPeople}`}
-        />
-      </View>
+        <View style={[styles.subSection, styles.listContainer]}>
+          <Text style={styles.titleText}>Existing Groups</Text>
+          <FlashList
+            onRefresh={async() => await refetch()}
+            refreshing={true}
+            data={groups || []}
+            renderItem={getGroupCard}
+            keyExtractor={(item) => `${item.name}${item.noOfPeople}`}
+            estimatedItemSize={100}
+          />
+        </View>
     </View>
   );
 };
@@ -112,6 +100,9 @@ const styles = StyleSheet.create({
   },
   subSection: {
     marginVertical: Margins.large,
+  },
+  listContainer: {
+    flex: 1,
   },
   titleText: {
     fontSize: 16,
