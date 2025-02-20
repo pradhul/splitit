@@ -10,23 +10,25 @@ import { StyleSheet, View, Text } from "react-native";
 import { ITransaction } from "@/types/transactions";
 import { Colors } from "@/constants/Colors";
 import { _getReadableDateTime, _makeReadableText } from "@/utils/stringUtils";
+import Card from "@/components/Card";
 
 interface IRecentItem extends Omit<ITransaction, "_modified"> {}
 
 const RecentsListItem = ({ amount, category, from, to, _created }: IRecentItem) => {
   return (
-    <View style={styles.recentsItemContainer}>
-      <View style={styles.recentsIcon}></View>
+    <Card>
+      <View style={styles.recentsItemContainer}>
+        <View style={styles.recentsIcon}></View>
 
-      <View style={styles.recentsDetailContainer}>
-        <Text style={styles.transactionText}>
-          <Text style={styles.from}>{from}</Text> Paid <Text style={styles.amount}>{amount}₹</Text>{" "}
-          To
-          <Text style={styles.to}> {_makeReadableText(to)}</Text>
-        </Text>
-        <Text>{_getReadableDateTime(_created || "")}</Text>
+        <View style={styles.recentsDetailContainer}>
+          <Text style={styles.transactionText}>
+            <Text style={styles.from}>{from}</Text> Paid <Text style={styles.amount}>{amount}₹</Text> To
+            <Text style={styles.to}> {_makeReadableText(to)}</Text>
+          </Text>
+          <Text>{_getReadableDateTime(_created || "")}</Text>
+        </View>
       </View>
-    </View>
+    </Card>
   );
 };
 

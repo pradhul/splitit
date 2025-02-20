@@ -95,7 +95,7 @@ const NewGroup = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.neutral,
+    backgroundColor: Colors.light.backGround,
     padding: Paddings.large,
   },
   subSection: {
