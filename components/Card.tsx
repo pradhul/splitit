@@ -3,7 +3,11 @@ import { View, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
 
 const Card = ({ children }: { children: React.ReactElement | React.ReactElement[] }) => {
-  return <View style={styles.card}>{children}</View>;
+  return (
+    <View testID="card" style={styles.card}>
+      {children}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
