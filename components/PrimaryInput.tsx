@@ -37,6 +37,7 @@ function PrimaryInput({
 
   return (
     <TextInput
+      testID="primary-input"
       autoFocus={autofocus}
       keyboardType={keyboardType}
       placeholder={placeholder}

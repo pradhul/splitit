@@ -11,22 +11,37 @@ import { ReactElement } from "react";
 import { ReactTestInstance } from "react-test-renderer";
 
 describe("<PrimaryInput />", () => {
-  let element: ReactTestInstance;
+  test("Default PrimaryInput should render with autofocus, keyboardType='default' with fontSize = 14", () => {
+    render(<PrimaryInput placeholder="test" onValueChange={jest.fn()} inputValue="" />);
+    let element = screen.getByTestId("primary-input");
 
-  beforeEach(() => {
-    render(<PrimaryInput />);
-    element = screen.getByPlaceholderText("₹");
-  });
-
-  test("PrimaryInput renders correctly with autofocus and number keypad", () => {
     expect(element).toBeTruthy();
     expect(element).toHaveProp("autoFocus", true);
-    expect(element).toHaveProp("keyboardType", "number-pad");
+    expect(element).toHaveProp("keyboardType", "default");
+    expect(element).toHaveStyle({ fontSize: 14 });
+    expect(element).toHaveProp("value", "");
   });
 
-  test("onChangetext changes the input value", () => {
-    fireEvent.changeText(element, "200");
+  test("onChangeText changes the input value", () => {
+    const mockOnValueChange = jest.fn();
+    render(<PrimaryInput placeholder="test" onValueChange={mockOnValueChange} inputValue="" />);
+    let element = screen.getByTestId("primary-input");
 
-    expect(element).toHaveProp("value", "200");
+    fireEvent.changeText(element, "200");
+    expect(mockOnValueChange).toHaveBeenCalledWith("200");
+  });
+
+  test("Keyboard of type number-pad should align text to center", () => {
+    render(<PrimaryInput placeholder="test" onValueChange={jest.fn()} inputValue="" keyboardType="number-pad" />);
+    let element = screen.getByTestId("primary-input");
+
+    expect(element).toHaveStyle({ textAlign: "center" });
+  });
+
+  test("PlaceHolder color should be #808080", () => {
+    render(<PrimaryInput placeholder="test" onValueChange={jest.fn()} inputValue="" />);
+    let element = screen.getByTestId("primary-input");
+
+    expect(element).toHaveProp("placeholderTextColor", "#808080");
   });
 });
