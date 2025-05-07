@@ -21,7 +21,7 @@ export default function PrimaryButton({
   title: string;
   onPress: Function;
   disabled?: boolean;
-  status?: Status;
+  status?: Status; // states of button if there is any async process
 }) {
   const bgColor = { backgroundColor: disabled ? colors.disabled : colors.primary };
 
